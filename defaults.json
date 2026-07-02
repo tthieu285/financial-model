@@ -1,0 +1,54 @@
+{
+  "inputs": {
+    "i-sf": "3.00",
+    "i-shcvr": "0",
+    "i-shrev": "0",
+    "i-ff": "2.00",
+    "i-focvr": "15",
+    "i-forev": "13.20",
+    "i-fhcvr": "0",
+    "i-fhrev": "0",
+    "i-cf": "2.00",
+    "i-cocvr": "15",
+    "i-corev": "15.00",
+    "i-cohcvr": "0",
+    "i-cohrev": "0",
+    "i-outpct": "30",
+    "i-logpct": "10",
+    "i-startmo": "8",
+    "cf-inv": "200000",
+    "cf-eq": "50000",
+    "cf-eq-mo": "1",
+    "cf-tech": "30000",
+    "cf-tech-mo": "1"
+  },
+  "partners": [
+    {"id":0,"name":"Happy IDEM","segment":"school","isMA":false,"maPrice":100000,"maPct":60,"maMo":1,
+     "annual":35000,"months":[false,true,true,true,true,true,false,true,true,true,false,false],"outpct":null},
+    {"id":1,"name":"Vision Spring","segment":"factory","isMA":false,"maPrice":100000,"maPct":100,"maMo":1,
+     "annual":8000,"months":[true,true,true,true,true,true,false,true,true,true,true,true],"outpct":0},
+    {"id":2,"name":"Ecohealth","segment":"corporate","isMA":false,"maPrice":100000,"maPct":100,"maMo":1,
+     "annual":10000,"months":[true,true,true,true,true,true,false,true,true,true,true,true],"outpct":0},
+    {"id":3,"name":"Việt Pháp","segment":"corporate","isMA":false,"maPrice":100000,"maPct":100,"maMo":1,
+     "annual":20000,"months":[true,true,true,true,true,true,false,true,true,true,true,true],"outpct":0}
+  ],
+  "ROLES": [
+    {"id":"r0","label":"Cử nhân khúc xạ","n":4,"sal":600},
+    {"id":"r1","label":"Kỹ thuật viên thị lực","n":3,"sal":500},
+    {"id":"r2","label":"Tư vấn kính","n":1,"sal":500},
+    {"id":"r3","label":"Tư vấn thuốc","n":1,"sal":500},
+    {"id":"r4","label":"Quản lý","n":1,"sal":2000},
+    {"id":"r5","label":"Admin / vận hành","n":1,"sal":500},
+    {"id":"r6","label":"Hỗ trợ kĩ thuật","n":1,"sal":500},
+    {"id":"r7","label":"BD","n":1,"sal":1000}
+  ],
+  "OVHD": [
+    {"id":"oh0","label":"Thuê văn phòng / kho","mo":2000},
+    {"id":"oh1","label":"Điện nước","mo":500},
+    {"id":"oh2","label":"Hạ tầng công nghệ","mo":1000},
+    {"id":"oh3","label":"Chi phí khác","mo":500}
+  ],
+  "nextPId": 4,
+  "nextRId": 8,
+  "nextOId": 4
+}

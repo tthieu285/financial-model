@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>God's Eyes — Financial Model</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F2F1EE;color:#1a1a1a;font-size:14px;line-height:1.5;min-width:1100px}
+.page{max-width:1440px;margin:0 auto;padding:40px 48px 80px}
+.header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:28px}
+.header h1{font-size:22px;font-weight:500;letter-spacing:-.3px}
+.header p{font-size:13px;color:#999;margin-top:3px}
+.live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#1D9E75;margin-right:6px;vertical-align:middle}
+.pills{display:flex;gap:8px;align-items:center}
+.pill{padding:4px 12px;border-radius:4px;font-size:12px;font-weight:500}
+.pill-s{background:#E1F5EE;color:#085041}.pill-f{background:#EEEDFE;color:#3C3489}
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px}
+.kpi{background:#fff;border:.5px solid #E3E2DE;border-radius:12px;padding:20px 22px}
+.kpi-label{font-size:12px;color:#999;margin-bottom:6px}
+.kpi-val{font-size:26px;font-weight:500;letter-spacing:-.5px}
+.kpi-sub{font-size:12px;color:#bbb;margin-top:4px}
+.card{background:#fff;border:.5px solid #E3E2DE;border-radius:12px;padding:24px}
+.card-title{font-size:11px;font-weight:500;letter-spacing:.6px;text-transform:uppercase;color:#bbb;margin-bottom:18px}
+.row-grid{display:grid;gap:14px;margin-bottom:14px}
+.g-3-1{grid-template-columns:1fr 340px}
+.g-4{grid-template-columns:repeat(4,1fr)}
+.pl-tbl{width:100%;border-collapse:collapse}
+.pl-tbl th{font-size:11px;color:#bbb;font-weight:400;text-align:right;padding:6px 10px;border-bottom:.5px solid #EFEFEB}
+.pl-tbl th:first-child{text-align:left}
+.pl-tbl td{padding:7px 10px;border-bottom:.5px solid #F5F4F0;font-size:13px}
+.pl-tbl td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
+.pl-tbl .sec td{font-size:11px;color:#bbb;font-weight:500;letter-spacing:.3px;text-transform:uppercase;padding-top:16px;padding-bottom:4px;border-bottom:none}
+.pl-tbl .sub td:first-child{padding-left:18px;color:#888}
+.pl-tbl .sub td{color:#555}
+.pl-tbl .total td{font-weight:500;border-top:.5px solid #E5E4E0;padding-top:9px;border-bottom:none}
+.pl-tbl .erow td{font-weight:500;background:#F8F7F4;padding:10px;border-radius:4px;border-bottom:none}
+.pl-tbl .spacer td{height:10px;border:none}
+.sens-tbl{width:100%;border-collapse:collapse}
+.sens-tbl th{font-size:11px;color:#bbb;font-weight:400;padding:6px 10px;text-align:center;border-bottom:.5px solid #EFEFEB}
+.sens-tbl th:first-child{text-align:left}
+.sens-tbl td{padding:7px 10px;border-bottom:.5px solid #F5F4F0;font-size:13px;text-align:center;font-variant-numeric:tabular-nums}
+.sens-tbl td:first-child{text-align:left;color:#888}
+.sens-tbl .base-row td{background:#F8F7F4;font-weight:500}
+.sens-badge{display:inline-block;font-size:10px;background:#F0EFF8;color:#534AB7;padding:1px 6px;border-radius:3px;margin-left:4px;font-weight:400;vertical-align:middle}
+.mo-wrap{overflow-x:auto}
+.mo-tbl{border-collapse:collapse;min-width:100%}
+.mo-tbl th{font-size:11px;color:#bbb;font-weight:400;padding:6px 12px;text-align:right;white-space:nowrap;border-bottom:.5px solid #EFEFEB}
+.mo-tbl th.lbl{text-align:left;min-width:160px}
+.mo-tbl th.q-hd{background:#FAFAF7;font-weight:500;color:#999}
+.mo-tbl td{font-size:12px;padding:5px 12px;border-bottom:.5px solid #F5F4F0;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.mo-tbl td.lbl{text-align:left}
+.mo-tbl .q-col{background:#FAFAF7}
+.mo-tbl .sec-row td{font-size:11px;color:#bbb;font-weight:500;text-transform:uppercase;letter-spacing:.3px;padding-top:14px;padding-bottom:3px;border-bottom:none}
+.mo-tbl .bold-row td{font-weight:500}
+.mo-tbl .sub-row td:first-child{padding-left:22px;color:#888}
+.mo-tbl .sub-row td{color:#666}
+.mo-tbl .e-row td{font-weight:500;background:#F8F7F4;padding:8px 12px}
+.mo-tbl .tot-col{border-left:.5px solid #E3E2DE;font-weight:500}
+.assum-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:.5px solid #F5F4F0}
+.assum-row:last-child{border-bottom:none}
+.assum-row label{font-size:13px;color:#555}
+.assum-input{width:90px;text-align:right;font-size:13px;border:none;border-bottom:1px solid #E3E2DE;background:transparent;padding:2px 4px;color:#1a1a1a}
+.assum-input:focus{outline:none;border-bottom-color:#7F77DD}
+.assum-input:hover{border-bottom-color:#bbb}
+.hc-tbl{width:100%;border-collapse:collapse}
+.hc-tbl th{font-size:11px;color:#bbb;font-weight:400;padding:5px 8px;text-align:right;border-bottom:.5px solid #EFEFEB}
+.hc-tbl th:first-child{text-align:left}
+.hc-tbl td{padding:6px 8px;border-bottom:.5px solid #F5F4F0;font-size:13px}
+.hc-tbl td:not(:first-child){text-align:right}
+.hc-tbl input{width:55px;text-align:right;font-size:13px;border:none;border-bottom:1px solid #E3E2DE;background:transparent;padding:2px 3px;color:#1a1a1a}
+.hc-tbl input:focus{outline:none;border-bottom-color:#7F77DD}
+.hc-tbl .tot-row td{font-weight:500;border-top:.5px solid #E3E2DE;color:#0F6E56;padding-top:8px}
+.cost-pill{display:inline-block;font-size:11px;background:#F5F4F0;color:#888;padding:2px 8px;border-radius:4px;margin-left:6px;font-weight:400}
+.pos{color:#0F6E56}.neg{color:#A32D2D}
+.muted{color:#bbb;font-style:italic;font-size:12px}
+.dot-s{display:inline-block;width:8px;height:8px;border-radius:50%;background:#1D9E75;margin-right:6px}
+.dot-f{display:inline-block;width:8px;height:8px;border-radius:50%;background:#7F77DD;margin-right:6px}
+.dot-c{display:inline-block;width:8px;height:8px;border-radius:50%;background:#E8883B;margin-right:6px}
+.pill-c{background:#FEF3C7;color:#B45309}
+.sec-divider{height:32px}
+.assum-section-title{font-size:11px;font-weight:500;letter-spacing:.4px;text-transform:uppercase;color:#bbb;margin:0 0 12px}
+.rps-box{background:#F8F7F4;border-radius:8px;padding:12px;margin-top:16px}
+.rps-box .lbl{font-size:11px;color:#bbb;margin-bottom:5px}
+.rps-box .val{font-size:20px;font-weight:500}
+.rps-box .sub{font-size:11px;color:#bbb;margin-top:3px}
+.mo-split-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px 10px;margin-top:8px}
+.mo-split-cell{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:.5px solid #F5F4F0}
+.mo-split-cell:nth-child(3n+1):nth-last-child(-n+3),.mo-split-cell:nth-child(3n+2):nth-last-child(-n+2),.mo-split-cell:nth-last-child(1){border-bottom:none}
+.mo-split-cell span{font-size:12px;color:#999;width:22px;flex-shrink:0}
+.mo-split-cell input{flex:1;min-width:0;text-align:right;font-size:12px;border:none;border-bottom:1px solid #E3E2DE;background:transparent;padding:1px 3px;color:#1a1a1a}
+.mo-split-cell input:focus{outline:none;border-bottom-color:#7F77DD}
+input[type=number]::-webkit-inner-spin-button{opacity:.3}
+input[type=number]::-webkit-outer-spin-button{opacity:.3}
+/* Partner table */
+.partner-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.partner-tbl th{font-size:11px;color:#bbb;font-weight:400;padding:5px 7px;text-align:center;border-bottom:.5px solid #EFEFEB;white-space:nowrap}
+.partner-tbl th:first-child{text-align:left;min-width:130px}
+.partner-tbl th:nth-child(2),.partner-tbl th:nth-child(3){min-width:72px}
+.partner-tbl th:nth-child(4){text-align:left;min-width:90px}
+.partner-tbl td{padding:5px 7px;border-bottom:.5px solid #F5F4F0;text-align:center;vertical-align:middle}
+.partner-tbl td:first-child{text-align:left}
+.partner-tbl input[type=text]{width:118px;font-size:12px;border:none;border-bottom:1px solid #E3E2DE;background:transparent;padding:2px 4px;color:#1a1a1a}
+.partner-tbl input[type=number]{width:62px;text-align:right;font-size:12px;border:none;border-bottom:1px solid #E3E2DE;background:transparent;padding:2px 3px;color:#1a1a1a}
+.partner-tbl input[type=text]:focus,.partner-tbl input[type=number]:focus{outline:none;border-bottom-color:#7F77DD}
+.partner-tbl select{font-size:12px;border:none;border-bottom:1px solid #E3E2DE;background:transparent;padding:2px 3px;color:#1a1a1a;cursor:pointer;min-width:82px}
+.partner-tbl input[type=checkbox]{width:14px;height:14px;cursor:pointer;accent-color:#7F77DD;margin:0}
+.partner-tbl .eff-cell{font-size:12px;color:#555;text-align:right;padding-right:4px;font-variant-numeric:tabular-nums;font-weight:500}
+.partner-tbl .tot-row td{font-weight:500;border-top:.5px solid #E3E2DE;color:#0F6E56;padding-top:8px;font-size:12px}
+/* Tabs */
+.tab-nav{display:flex;gap:4px;margin-bottom:28px;border-bottom:.5px solid #E3E2DE;padding-bottom:0}
+.tab-btn{padding:8px 20px;font-size:14px;font-weight:400;color:#999;background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s}
+.tab-btn:hover{color:#555}
+.tab-btn.active{color:#1a1a1a;font-weight:500;border-bottom-color:#1a1a1a}
+/* Cashflow */
+.cf-assum-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:.5px solid #F5F4F0}
+.cf-assum-row:last-child{border-bottom:none}
+.cf-assum-row label{font-size:13px;color:#555}
+.uof-card{background:#fff;border:.5px solid #E3E2DE;border-radius:12px;padding:20px 22px}
+.uof-label{font-size:12px;color:#999;margin-bottom:6px}
+.uof-val{font-size:22px;font-weight:500;letter-spacing:-.3px}
+.uof-sub{font-size:12px;color:#bbb;margin-top:4px}
+.uof-bar{height:6px;border-radius:3px;margin-top:10px}
+.cf-tbl{border-collapse:collapse;min-width:100%}
+.cf-tbl th{font-size:11px;color:#bbb;font-weight:400;padding:6px 12px;text-align:right;white-space:nowrap;border-bottom:.5px solid #EFEFEB}
+.cf-tbl th.lbl{text-align:left;min-width:170px}
+.cf-tbl th.q-hd{background:#FAFAF7;font-weight:500;color:#999}
+.cf-tbl td{font-size:12px;padding:5px 12px;border-bottom:.5px solid #F5F4F0;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.cf-tbl td.lbl{text-align:left}
+.cf-tbl .q-col{background:#FAFAF7}
+.cf-tbl .sec-row td{font-size:11px;color:#bbb;font-weight:500;text-transform:uppercase;letter-spacing:.3px;padding-top:14px;padding-bottom:3px;border-bottom:none}
+.cf-tbl .bold-row td{font-weight:500}
+.cf-tbl .sub-row td:first-child{padding-left:22px;color:#888}
+.cf-tbl .sub-row td{color:#666}
+.cf-tbl .hi-row td{font-weight:500;background:#F8F7F4;padding:8px 12px}
+.cf-tbl .hi-neg td{font-weight:500;background:#FEF3F3;padding:8px 12px}
+.cf-tbl .tot-col{border-left:.5px solid #E3E2DE;font-weight:500}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- HEADER -->
+<div class="header" style="margin-bottom:16px">
+  <div>
+    <h1><span style="font-size:28px;font-weight:600;letter-spacing:-.5px">God's Eyes</span> <span style="font-weight:400;color:#bbb;font-size:16px">· Financial Model</span></h1>
+    <p><span class="live-dot"></span>Year 1 projection · All inputs editable · Updates live</p>
+  </div>
+  <div class="pills">
+    <span class="pill pill-s"><span class="dot-s"></span>School</span>
+    <span class="pill pill-f"><span class="dot-f"></span>Factory</span>
+    <span class="pill pill-c"><span class="dot-c"></span>Corporate</span>
+  </div>
+</div>
+
+<!-- TAB NAV -->
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="showTab('model')">Financial Model</button>
+  <button class="tab-btn" onclick="showTab('cashflow')">Cash Flow &amp; Use of Funds</button>
+</div>
+
+<div id="tab-model">
+<!-- KPI CARDS -->
+<div class="kpi-row">
+  <div class="kpi">
+    <div class="kpi-label">Total screenings</div>
+    <div class="kpi-val" id="k-vol">—</div>
+    <div class="kpi-sub" id="k-vol-sub" style="line-height:1.7">—</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Total revenue</div>
+    <div class="kpi-val" id="k-rev">—</div>
+    <div class="kpi-sub" id="k-rev-sub">—</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Revenue / screening</div>
+    <div class="kpi-val" id="k-rps">—</div>
+    <div class="kpi-sub" id="k-rps-sub">per segment</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">EBITDA</div>
+    <div class="kpi-val" id="k-ebitda">—</div>
+    <div class="kpi-sub" id="k-margin">—</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Break-even month</div>
+    <div class="kpi-val" id="k-be">—</div>
+    <div class="kpi-sub">cumulative EBITDA ≥ 0</div>
+  </div>
+</div>
+
+<!-- P&L + RIGHT COLUMN -->
+<div class="row-grid g-3-1" style="align-items:start">
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:18px">
+      <div class="card-title" style="margin-bottom:0">Annual P&L</div>
+      <div style="font-size:11px;color:#bbb">Staff allocated proportionally by revenue</div>
+    </div>
+    <table class="pl-tbl">
+      <thead>
+        <tr>
+          <th style="width:36%">Line item</th>
+          <th style="color:#085041"><span class="dot-s"></span>School</th>
+          <th style="color:#3C3489"><span class="dot-f"></span>Factory</th>
+          <th style="color:#B45309"><span class="dot-c"></span>Corporate</th>
+          <th>Total</th>
+          <th>% of rev</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="sec"><td colspan="6">Revenue</td></tr>
+        <tr class="sub"><td>Screening fee</td><td id="rs1">—</td><td id="rf1">—</td><td id="rc1">—</td><td id="rt1">—</td><td id="rp1" class="muted">—</td></tr>
+        <tr class="sub"><td>On-site conversion</td><td class="muted">n/a</td><td id="rf2">—</td><td id="rc2">—</td><td id="rt2">—</td><td id="rp2" class="muted">—</td></tr>
+        <tr class="sub"><td>Hospital referral</td><td id="rs3">—</td><td id="rf3">—</td><td id="rc3">—</td><td id="rt3">—</td><td id="rp3" class="muted">—</td></tr>
+        <tr class="total"><td>Total revenue</td><td id="rs-tot">—</td><td id="rf-tot">—</td><td id="rc-tot">—</td><td id="r-tot">—</td><td>100%</td></tr>
+
+        <tr class="sec"><td colspan="6">Costs</td></tr>
+        <tr class="sub">
+          <td>Outreach <span class="cost-pill" id="lbl-outreach">30% of fee</span></td>
+          <td id="cout-s">—</td><td id="cout-f">—</td><td id="cout-c">—</td><td id="cout-tot">—</td><td id="cp-out" class="muted">—</td>
+        </tr>
+        <tr class="sub">
+          <td>Logistics <span class="cost-pill" id="lbl-logistic">5% of fee</span></td>
+          <td id="clog-s">—</td><td id="clog-f">—</td><td id="clog-c">—</td><td id="clog-tot">—</td><td id="cp-log" class="muted">—</td>
+        </tr>
+        <tr class="sub">
+          <td>Staff (headcount-based)</td>
+          <td id="cstaff-s" class="muted">—</td><td id="cstaff-f" class="muted">—</td><td id="cstaff-c" class="muted">—</td><td id="c-staff">—</td><td id="cp-staff" class="muted">—</td>
+        </tr>
+        <tr class="sub">
+          <td>Fixed overhead <span class="cost-pill" id="lbl-overhead">$4K/mo</span></td>
+          <td id="covhd-s" class="muted">—</td><td id="covhd-f" class="muted">—</td><td id="covhd-c" class="muted">—</td><td id="covhd-tot">—</td><td id="cp-ovhd" class="muted">—</td>
+        </tr>
+        <tr class="total"><td>Total costs</td><td id="ctot-s">—</td><td id="ctot-f">—</td><td id="ctot-c">—</td><td id="c-tot">—</td><td id="cp-tot" class="muted">—</td></tr>
+
+        <tr class="spacer"><td colspan="6"></td></tr>
+        <tr class="erow">
+          <td>EBITDA</td>
+          <td id="ebitda-s">—</td><td id="ebitda-f">—</td><td id="ebitda-c">—</td>
+          <td id="ebitda-cell">—</td>
+          <td id="ebitda-pct">—</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div class="card">
+      <div class="card-title">Sensitivity — volume ±20%</div>
+      <table class="sens-tbl">
+        <thead>
+          <tr>
+            <th style="text-align:left">Scenario</th>
+            <th>Conservative</th>
+            <th>Base <span class="sens-badge">current</span></th>
+            <th>Best</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Screenings</td><td id="sv0">—</td><td id="sv1">—</td><td id="sv2">—</td></tr>
+          <tr><td>Revenue</td><td id="sr0">—</td><td id="sr1">—</td><td id="sr2">—</td></tr>
+          <tr class="base-row"><td>EBITDA</td><td id="se0">—</td><td id="se1">—</td><td id="se2">—</td></tr>
+          <tr><td>Margin</td><td id="sm0">—</td><td id="sm1">—</td><td id="sm2">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Revenue mix</div>
+      <div style="position:relative;height:190px">
+        <canvas id="mixChart" role="img" aria-label="Revenue breakdown by stream"></canvas>
+      </div>
+      <div id="mix-legend" style="margin-top:12px;font-size:12px;color:#888"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Monthly trend chart -->
+<div class="sec-divider"></div>
+<div class="card">
+  <div class="card-title">Monthly revenue & EBITDA trend</div>
+  <div style="position:relative;height:240px">
+    <canvas id="moChart" role="img" aria-label="Monthly revenue bars with EBITDA line"></canvas>
+  </div>
+</div>
+
+<!-- 12-month rollout table -->
+<div class="sec-divider"></div>
+<div class="card">
+  <div class="card-title">12-month rollout</div>
+  <div class="mo-wrap">
+    <table class="mo-tbl">
+      <thead id="mo-head"></thead>
+      <tbody id="mo-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ─── ASSUMPTIONS ─── -->
+<div class="sec-divider"></div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+  <div>
+    <div style="font-size:16px;font-weight:500;margin-bottom:4px">Assumptions</div>
+    <div style="font-size:13px;color:#999">Edit any input — all figures above update instantly</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px">
+  <button id="save-default-btn" onclick="openSaveModal()"
+    style="display:flex;align-items:center;gap:6px;padding:9px 14px;background:#1a1a1a;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;letter-spacing:.01em">
+    🔒 Save as Default
+  </button>
+  <div style="display:flex;align-items:center;gap:10px;background:#fff;border:.5px solid #E3E2DE;border-radius:8px;padding:10px 16px">
+    <span style="font-size:12px;color:#888;white-space:nowrap">📅 M1 bắt đầu từ</span>
+    <select id="i-startmo" onchange="calc()" style="font-size:13px;font-weight:500;border:none;background:transparent;padding:2px 4px;color:#1a1a1a;cursor:pointer;outline:none">
+      <option value="1">January</option><option value="2">February</option><option value="3">March</option>
+      <option value="4">April</option><option value="5">May</option><option value="6">June</option>
+      <option value="7">July</option><option value="8" selected>August</option><option value="9">September</option>
+      <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+    </select>
+  </div>
+  </div>
+</div>
+
+<!-- CARD 1: M&A & Partner Setup -->
+<div class="card" style="margin-bottom:14px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <div class="assum-section-title" style="margin-bottom:0">Equity & M&A — partner setup</div>
+    <button onclick="addPartner()" style="display:flex;align-items:center;gap:5px;padding:5px 12px;background:#1a1a1a;color:#fff;border:none;border-radius:5px;font-size:12px;cursor:pointer;font-weight:500">
+      <span style="font-size:16px;line-height:1">+</span> Thêm đối tác
+    </button>
+  </div>
+  <table class="partner-tbl" id="ps-tbl">
+    <thead>
+      <tr>
+        <th style="text-align:left;min-width:130px">Partner</th>
+        <th style="text-align:left;min-width:90px">Segment</th>
+        <th style="min-width:44px">M&A</th>
+        <th style="min-width:100px">Giá M&A (100%)</th>
+        <th style="min-width:62px">Stake %</th>
+        <th style="min-width:68px">Tháng TT</th>
+        <th style="min-width:90px;text-align:right">M&A cost</th>
+        <th style="min-width:28px"></th>
+      </tr>
+    </thead>
+    <tbody id="ps-body"></tbody>
+    <tfoot id="ps-foot"></tfoot>
+  </table>
+</div>
+
+<!-- CARD 2: Screening Volume -->
+<div class="card" style="margin-bottom:14px">
+  <div class="assum-section-title">Screening volume — partner pipeline</div>
+  <div style="overflow-x:auto">
+    <table class="partner-tbl" id="pv-tbl">
+      <thead>
+        <tr>
+          <th style="text-align:left;min-width:130px">Partner</th>
+          <th style="text-align:left;min-width:80px">Segment</th>
+          <th style="min-width:88px">Annual vol.</th>
+          <th style="min-width:64px">Outreach %<br><span style="font-size:9px;font-weight:300;color:#ccc;font-style:italic">blank=global</span></th>
+          <th>M1</th><th>M2</th><th>M3</th><th>M4</th><th>M5</th><th>M6</th>
+          <th>M7</th><th>M8</th><th>M9</th><th>M10</th><th>M11</th><th>M12</th>
+          <th style="min-width:72px;text-align:right">/tháng</th>
+        </tr>
+      </thead>
+      <tbody id="pv-body"></tbody>
+      <tfoot id="pv-foot"></tfoot>
+    </table>
+  </div>
+  <div style="height:18px"></div>
+  <div class="assum-section-title">Cost rates & fixed overhead</div>
+  <div style="display:flex;gap:40px;align-items:center;flex-wrap:wrap">
+    <div class="assum-row"><label>Outreach % <span style="font-size:11px;color:#bbb;font-weight:400">(global default)</span></label><input class="assum-input" type="number" id="i-outpct" value="30" step="1" oninput="calc()"></div>
+    <div class="assum-row"><label>Logistics %</label><input class="assum-input" type="number" id="i-logpct" value="10" step="1" oninput="calc()"></div>
+  </div>
+  <div style="font-size:11px;color:#bbb;margin-top:6px">Outreach có thể override riêng cho từng partner ở cột "Outreach %" trong bảng trên · Để trống = dùng global default</div>
+  <div style="height:16px"></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <div class="assum-section-title" style="margin-bottom:0">Fixed overhead <span style="font-size:11px;font-weight:400;color:#bbb;text-transform:none;letter-spacing:0">— phát sinh dù có hay không có doanh thu</span></div>
+    <button onclick="addOvhd()" style="display:flex;align-items:center;gap:4px;padding:4px 10px;background:#1a1a1a;color:#fff;border:none;border-radius:5px;font-size:11px;cursor:pointer;font-weight:500">
+      <span style="font-size:14px;line-height:1">+</span> Add item
+    </button>
+  </div>
+  <table class="hc-tbl" id="ovhd-tbl">
+    <thead>
+      <tr><th style="text-align:left">Category</th><th>$/mo</th><th>Annual</th><th></th></tr>
+    </thead>
+    <tbody id="ovhd-body"></tbody>
+    <tfoot>
+      <tr class="tot-row"><td colspan="2">Total fixed overhead / mo</td><td id="ovhd-total" style="text-align:right">—</td><td></td></tr>
+    </tfoot>
+  </table>
+</div>
+
+<div class="row-grid" style="grid-template-columns:repeat(4,1fr);align-items:start">
+
+  <!-- School -->
+  <div class="card">
+    <div class="assum-section-title"><span class="dot-s"></span>School</div>
+    <div class="assum-row"><label>Screening fee ($/person)</label><input class="assum-input" type="number" id="i-sf" value="3.00" step="0.5" oninput="calc()"></div>
+    <div class="assum-row"><label>Referral CVR (%)</label><input class="assum-input" type="number" id="i-shcvr" value="0" step="0.1" oninput="calc()"></div>
+    <div class="assum-row"><label>Referral fee / case ($)</label><input class="assum-input" type="number" id="i-shrev" value="0" step="5" oninput="calc()"></div>
+    <div class="rps-box">
+      <div class="lbl">REV / SCREENING</div>
+      <div class="val" id="s-rps" style="color:#085041">—</div>
+      <div class="sub">fee + referral</div>
+    </div>
+  </div>
+
+  <!-- Factory -->
+  <div class="card">
+    <div class="assum-section-title"><span class="dot-f"></span>Factory</div>
+    <div class="assum-row"><label>Screening fee ($/person)</label><input class="assum-input" type="number" id="i-ff" value="2.00" step="0.5" oninput="calc()"></div>
+    <div class="assum-row"><label>On-site CVR (%)</label><input class="assum-input" type="number" id="i-focvr" value="15" step="1" oninput="calc()"></div>
+    <div class="assum-row"><label>On-site rev / case ($)</label><input class="assum-input" type="number" id="i-forev" value="13.20" step="1" oninput="calc()"></div>
+    <div class="assum-row"><label>Referral CVR (%)</label><input class="assum-input" type="number" id="i-fhcvr" value="0" step="0.1" oninput="calc()"></div>
+    <div class="assum-row"><label>Referral fee / case ($)</label><input class="assum-input" type="number" id="i-fhrev" value="0" step="5" oninput="calc()"></div>
+    <div class="rps-box">
+      <div class="lbl">REV / SCREENING</div>
+      <div class="val" id="f-rps" style="color:#3C3489">—</div>
+      <div class="sub">fee + on-site + referral</div>
+    </div>
+  </div>
+
+  <!-- Corporate (new) -->
+  <div class="card">
+    <div class="assum-section-title"><span class="dot-c"></span>Corporate</div>
+    <div class="assum-row"><label>Screening fee ($/person)</label><input class="assum-input" type="number" id="i-cf" value="2.00" step="0.5" oninput="calc()"></div>
+    <div class="assum-row"><label>On-site CVR (%)</label><input class="assum-input" type="number" id="i-cocvr" value="15" step="1" oninput="calc()"></div>
+    <div class="assum-row"><label>On-site rev / case ($)</label><input class="assum-input" type="number" id="i-corev" value="15.00" step="1" oninput="calc()"></div>
+    <div class="assum-row"><label>Referral CVR (%)</label><input class="assum-input" type="number" id="i-cohcvr" value="0" step="0.1" oninput="calc()"></div>
+    <div class="assum-row"><label>Referral fee / case ($)</label><input class="assum-input" type="number" id="i-cohrev" value="0" step="5" oninput="calc()"></div>
+    <div class="rps-box">
+      <div class="lbl">REV / SCREENING</div>
+      <div class="val" id="c-rps" style="color:#B45309">—</div>
+      <div class="sub">fee + on-site + referral</div>
+    </div>
+  </div>
+
+  <!-- Headcount -->
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div class="assum-section-title" style="margin-bottom:0">Headcount & salary</div>
+      <button onclick="addRole()" style="display:flex;align-items:center;gap:4px;padding:4px 10px;background:#1a1a1a;color:#fff;border:none;border-radius:5px;font-size:11px;cursor:pointer;font-weight:500">
+        <span style="font-size:14px;line-height:1">+</span> Add role
+      </button>
+    </div>
+    <table class="hc-tbl">
+      <thead>
+        <tr><th style="text-align:left">Role</th><th>Heads</th><th>$/mo</th><th>Annual</th><th></th></tr>
+      </thead>
+      <tbody id="hc-body"></tbody>
+      <tfoot>
+        <tr class="tot-row"><td colspan="4">Total staff cost</td><td id="hc-total">—</td><td></td></tr>
+      </tfoot>
+    </table>
+  </div>
+
+</div>
+</div><!-- end tab-model -->
+
+<!-- ═══════════════════ CASHFLOW TAB ═══════════════════ -->
+<div id="tab-cashflow" style="display:none">
+
+  <!-- KPI row -->
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-label">Total investment</div><div class="kpi-val" id="cf-k-inv">—</div><div class="kpi-sub">raised & deployed</div></div>
+    <div class="kpi"><div class="kpi-label">Min. cash balance</div><div class="kpi-val" id="cf-k-min">—</div><div class="kpi-sub" id="cf-k-min-mo">lowest point</div></div>
+    <div class="kpi"><div class="kpi-label">Cash flow positive</div><div class="kpi-val" id="cf-k-pos">—</div><div class="kpi-sub">month operating CF turns +</div></div>
+    <div class="kpi"><div class="kpi-label">Cash positive (cumul.)</div><div class="kpi-val" id="cf-k-cum">—</div><div class="kpi-sub">month cumulative CF ≥ 0</div></div>
+    <div class="kpi"><div class="kpi-label">Ending cash (M12)</div><div class="kpi-val" id="cf-k-end">—</div><div class="kpi-sub">closing balance</div></div>
+  </div>
+
+  <!-- Use of funds + cashflow assumptions -->
+  <div class="row-grid g-3-1" style="align-items:start;margin-bottom:14px">
+
+    <!-- Use of funds visual -->
+    <div class="card">
+      <div class="card-title">Use of funds</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+        <div class="uof-card"><div class="uof-label">M&A acquisitions</div><div class="uof-val" id="uof-ma">—</div><div class="uof-sub">từ partner setup</div><div class="uof-bar" style="background:#1D9E75" id="uof-ma-bar"></div></div>
+        <div class="uof-card"><div class="uof-label">Equipment CapEx</div><div class="uof-val" id="uof-eq">—</div><div class="uof-sub">screening devices (Ph.1+3)</div><div class="uof-bar" style="background:#7F77DD" id="uof-eq-bar"></div></div>
+        <div class="uof-card"><div class="uof-label">Tech / AI build</div><div class="uof-val" id="uof-tech">—</div><div class="uof-sub">platform development</div><div class="uof-bar" style="background:#AFA9EC" id="uof-tech-bar"></div></div>
+        <div class="uof-card"><div class="uof-label">Working capital</div><div class="uof-val" id="uof-wc">—</div><div class="uof-sub">ops buffer (derived from CF)</div><div class="uof-bar" style="background:#E24B4A" id="uof-wc-bar"></div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:0;height:10px;border-radius:5px;overflow:hidden" id="uof-stacked-bar"></div>
+      <div style="display:flex;gap:16px;margin-top:10px;font-size:12px;color:#888" id="uof-legend"></div>
+    </div>
+
+    <!-- Cashflow assumptions -->
+    <div class="card">
+      <div class="card-title">Cashflow assumptions</div>
+      <div class="assum-section-title">Investment</div>
+      <div class="cf-assum-row"><label>Total investment ($)</label><input class="assum-input" type="number" id="cf-inv" value="200000" step="10000" oninput="calcCF()"></div>
+      <div style="height:14px"></div>
+      <div class="assum-section-title">CapEx schedule</div>
+      <div class="cf-assum-row"><label>Total M&A cost</label><span class="assum-input" id="cf-ma-display" style="display:inline-block;color:#555;border-bottom-color:transparent">—</span></div>
+      <div style="font-size:11px;color:#bbb;padding:0 0 8px;text-align:right">Tổng từ partner setup · timing per partner</div>
+      <div class="cf-assum-row"><label>Equipment CapEx ($)</label><input class="assum-input" type="number" id="cf-eq" value="50000" step="5000" oninput="calcCF()"></div>
+      <div class="cf-assum-row"><label>Equipment payment month</label><input class="assum-input" type="number" id="cf-eq-mo" value="1" min="0" max="12" step="1" oninput="calcCF()"></div>
+      <div class="cf-assum-row"><label>Tech / AI build ($)</label><input class="assum-input" type="number" id="cf-tech" value="30000" step="5000" oninput="calcCF()"></div>
+      <div class="cf-assum-row"><label>Tech payment month</label><input class="assum-input" type="number" id="cf-tech-mo" value="1" min="0" max="12" step="1" oninput="calcCF()"></div>
+    </div>
+
+  </div>
+
+  <!-- 12-month cashflow table -->
+  <div class="card">
+    <div class="card-title">12-month cash flow statement</div>
+    <div class="mo-wrap">
+      <table class="cf-tbl">
+        <thead id="cf-head"></thead>
+        <tbody id="cf-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- end tab-cashflow -->
+
+<script>
+let ROLES=[
+  {id:'r0',label:'Cử nhân khúc xạ',n:4,sal:600},
+  {id:'r1',label:'Kỹ thuật viên thị lực',n:3,sal:500},
+  {id:'r2',label:'Tư vấn kính',n:1,sal:500},
+  {id:'r3',label:'Tư vấn thuốc',n:1,sal:500},
+  {id:'r4',label:'Quản lý',n:1,sal:2000},
+  {id:'r5',label:'Admin / vận hành',n:1,sal:500},
+  {id:'r6',label:'Hỗ trợ kĩ thuật',n:1,sal:500},
+  {id:'r7',label:'BD',n:1,sal:1000}
+];
+let nextRId=8;
+
+// ─── Fixed overhead items ────────────────────────────────────────────
+let OVHD=[
+  {id:'oh0',label:'Thuê văn phòng / kho',mo:2000},
+  {id:'oh1',label:'Điện nước',mo:500},
+  {id:'oh2',label:'Hạ tầng công nghệ',mo:1000},
+  {id:'oh3',label:'Chi phí khác',mo:500}
+];
+let nextOId=4;
+
+function buildOverhead(){
+  const tb=document.getElementById('ovhd-body');if(!tb)return;
+  tb.innerHTML=OVHD.map(o=>`<tr>
+    <td><input type="text" value="${o.label}"
+      style="width:160px;font-size:12px;border:none;border-bottom:1px solid #E3E2DE;background:transparent;padding:2px 4px;color:#555"
+      oninput="setOLabel('${o.id}',this.value)"></td>
+    <td><input type="number" id="${o.id}-mo" value="${o.mo}" min="0" step="100"
+      style="width:62px;text-align:right;font-size:12px;border:none;border-bottom:1px solid #E3E2DE;background:transparent;padding:2px 3px;color:#1a1a1a"
+      oninput="setOMo('${o.id}',this.value)"></td>
+    <td id="${o.id}-ann" style="color:#888;text-align:right">—</td>
+    <td style="text-align:center"><button onclick="removeOvhd('${o.id}')"
+      style="background:none;border:none;cursor:pointer;color:#ccc;font-size:15px;padding:1px 5px;border-radius:3px;line-height:1"
+      onmouseenter="this.style.color='#A32D2D'" onmouseleave="this.style.color='#ccc'">×</button></td>
+  </tr>`).join('');
+}
+function addOvhd(){
+  OVHD.push({id:'oh'+nextOId++,label:'New item',mo:0});
+  buildOverhead();calc();
+}
+function removeOvhd(id){
+  OVHD=OVHD.filter(o=>o.id!==id);
+  buildOverhead();calc();
+}
+function setOLabel(id,val){const o=OVHD.find(o=>o.id===id);if(o)o.label=val;}
+function setOMo(id,val){const o=OVHD.find(o=>o.id===id);if(o){o.mo=parseFloat(val)||0;calc();}}
+
+function overheadCost(){
+  let total=0;
+  OVHD.forEach(o=>{
+    const ann=o.mo*12;
+    s(o.id+'-ann',fmt(ann));
+    total+=ann;
+  });
+  const mo=total/12;
+  s('ovhd-total',fmt(mo)+'/mo  →  '+fmt(total)+'/yr');
+  return total; // returns annual
+}
+
+function buildHC(){
+  const tb=document.getElementById('hc-body');
+  tb.innerHTML=ROLES.map(r=>`<tr>
+    <td><input type="text" value="${r.label}"
+      style="width:138px;font-size:12px;border:none;border-bottom:1px solid #E3E2DE;background:transparent;padding:2px 4px;color:#555"
+      oninput="setRLabel('${r.id}',this.value)"></td>
+    <td><input type="number" id="${r.id}-n" value="${r.n}" min="0" step="1"
+      style="width:40px;text-align:right;font-size:12px;border:none;border-bottom:1px solid #E3E2DE;background:transparent;padding:2px 3px;color:#1a1a1a"
+      oninput="setRN('${r.id}',this.value)"></td>
+    <td><input type="number" id="${r.id}-s" value="${r.sal}" step="50"
+      style="width:54px;text-align:right;font-size:12px;border:none;border-bottom:1px solid #E3E2DE;background:transparent;padding:2px 3px;color:#1a1a1a"
+      oninput="setRS('${r.id}',this.value)"></td>
+    <td id="${r.id}-ann" style="color:#888;text-align:right">—</td>
+    <td style="text-align:center"><button onclick="removeRole('${r.id}')"
+      style="background:none;border:none;cursor:pointer;color:#ccc;font-size:15px;padding:1px 5px;border-radius:3px;line-height:1"
+      onmouseenter="this.style.color='#A32D2D'" onmouseleave="this.style.color='#ccc'">×</button></td>
+  </tr>`).join('');
+}
+
+function addRole(){
+  const id='r'+nextRId++;
+  ROLES.push({id,label:'New role',n:1,sal:500});
+  buildHC();calc();
+}
+function removeRole(id){
+  if(ROLES.length<=1)return; // keep at least 1
+  ROLES=ROLES.filter(r=>r.id!==id);
+  buildHC();calc();
+}
+function setRLabel(id,val){const r=ROLES.find(r=>r.id===id);if(r)r.label=val;}
+function setRN(id,val){const r=ROLES.find(r=>r.id===id);if(r)r.n=parseInt(val)||0;calc();}
+function setRS(id,val){const r=ROLES.find(r=>r.id===id);if(r)r.sal=parseFloat(val)||0;calc();}
+
+// ─── Partner data model ───────────────────────────────────────────
+let partners=[];
+let nextPId=0;
+
+const SEG_LABEL={'school':'School','factory':'Factory','corporate':'Corporate'};
+const SEG_BG={'school':'#E1F5EE','factory':'#EEEDFE','corporate':'#FEF3C7'};
+const SEG_CLR={'school':'#085041','factory':'#3C3489','corporate':'#B45309'};
+
+function addPartner(){
+  partners.push({id:nextPId++,name:'',segment:'school',isMA:false,maPrice:100000,maPct:100,maMo:1,annual:0,months:Array(12).fill(true),outpct:null});
+  renderPS();renderPV();calc();
+}
+function removePartner(id){
+  partners=partners.filter(p=>p.id!==id);
+  renderPS();renderPV();calc();
+}
+function setPField(id,field,val){
+  const p=partners.find(p=>p.id===id);if(!p)return;
+  if(field==='isMA') p.isMA=val;
+  else if(field==='annual'||field==='maPrice'||field==='maPct'||field==='maMo') p[field]=parseFloat(val)||0;
+  else if(field==='outpct') p.outpct=(val===''||val===null||val===undefined)?null:(parseFloat(val)??null);
+  else p[field]=val;
+  // Live-update derived cells without full re-render
+  if(field==='annual') updatePVFooter();
+  if(field==='name'){const el=document.getElementById(`pv-${id}-lbl`);if(el)el.textContent=val||'—';}
+  if(field==='segment'){
+    const el=document.getElementById(`pv-${id}-seg`);
+    if(el){el.textContent=SEG_LABEL[val];el.style.background=SEG_BG[val];el.style.color=SEG_CLR[val];}
+    const psel=document.getElementById(`ps-${id}-seg`);// already updated by select itself
+  }
+  if(field==='isMA'||field==='maPrice'||field==='maPct'){
+    const costEl=document.getElementById(`ps-${id}-cost`);
+    if(costEl) costEl.textContent=p.isMA?fmt(p.maPrice*p.maPct/100):'—';
+    // dim/undim price+pct inputs
+    ['price','pct','mamo'].forEach(f=>{
+      const el=document.getElementById(`ps-${id}-${f}`);
+      if(el) el.style.opacity=p.isMA?'1':'0.3';
+    });
+    updateMATotals();
+  }
+  calc();
+}
+function setPMonth(id,mi,checked){
+  const p=partners.find(p=>p.id===id);if(!p)return;
+  p.months[mi]=checked;
+  updateMonthlyCell(id);
+  calc();
+}
+function updateMonthlyCell(id){
+  const p=partners.find(p=>p.id===id);if(!p)return;
+  const cnt=p.months.filter(Boolean).length;
+  const mo=cnt>0?p.annual/cnt:0;
+  const el=document.getElementById(`pv-${id}-mo`);
+  if(el) el.textContent=mo>0?fmtN(mo)+'/mo':'—';
+}
+function updateMATotals(){
+  const total=partners.filter(p=>p.isMA).reduce((a,p)=>a+p.maPrice*p.maPct/100,0);
+  const el=document.getElementById('ps-ma-total');if(el)el.textContent=total>0?fmt(total):'—';
+  const cfEl=document.getElementById('cf-ma-display');if(cfEl)cfEl.textContent=total>0?fmt(total):'—';
+  s('uof-ma',total>0?fmt(total):'—');
+}
+
+function renderPS(){
+  const tb=document.getElementById('ps-body');const ft=document.getElementById('ps-foot');if(!tb)return;
+  if(partners.length===0){
+    tb.innerHTML=`<tr><td colspan="8" style="text-align:center;color:#bbb;padding:20px;font-size:12px">Nhấn "+ Thêm đối tác" để bắt đầu</td></tr>`;
+    if(ft)ft.innerHTML='';return;
+  }
+  tb.innerHTML=partners.map(p=>{
+    const dim=p.isMA?'1':'0.3';
+    const cost=p.isMA?fmt(p.maPrice*p.maPct/100):'—';
+    return`<tr>
+      <td><input type="text" id="ps-${p.id}-name" value="${p.name}" placeholder="Tên đối tác"
+        oninput="setPField(${p.id},'name',this.value)"
+        style="width:128px;font-size:12px;border:none;border-bottom:1px solid #E3E2DE;background:transparent;padding:2px 4px;color:#1a1a1a"></td>
+      <td><select id="ps-${p.id}-seg" onchange="setPField(${p.id},'segment',this.value)"
+        style="font-size:12px;border:none;border-bottom:1px solid #E3E2DE;background:transparent;padding:2px 3px;color:#1a1a1a;cursor:pointer;width:90px">
+        <option value="school" ${p.segment==='school'?'selected':''}>School</option>
+        <option value="factory" ${p.segment==='factory'?'selected':''}>Factory</option>
+        <option value="corporate" ${p.segment==='corporate'?'selected':''}>Corporate</option>
+      </select></td>
+      <td style="text-align:center"><input type="checkbox" ${p.isMA?'checked':''}
+        onchange="setPField(${p.id},'isMA',this.checked)"
+        style="width:14px;height:14px;cursor:pointer;accent-color:#7F77DD"></td>
+      <td><input type="number" id="ps-${p.id}-price" value="${p.maPrice}" min="0" step="5000"
+        oninput="setPField(${p.id},'maPrice',this.value)"
+        style="width:95px;text-align:right;font-size:12px;border:none;border-bottom:1px solid #E3E2DE;background:transparent;padding:2px 3px;color:#1a1a1a;opacity:${dim}"></td>
+      <td><input type="number" id="ps-${p.id}-pct" value="${p.maPct}" min="0" max="100" step="5"
+        oninput="setPField(${p.id},'maPct',this.value)"
+        style="width:52px;text-align:right;font-size:12px;border:none;border-bottom:1px solid #E3E2DE;background:transparent;padding:2px 3px;color:#1a1a1a;opacity:${dim}"></td>
+      <td><input type="number" id="ps-${p.id}-mamo" value="${p.maMo}" min="1" max="12" step="1"
+        oninput="setPField(${p.id},'maMo',this.value)"
+        style="width:58px;text-align:right;font-size:12px;border:none;border-bottom:1px solid #E3E2DE;background:transparent;padding:2px 3px;color:#1a1a1a;opacity:${dim}"></td>
+      <td style="text-align:right;font-size:12px;font-weight:500;font-variant-numeric:tabular-nums;padding-right:8px;color:${p.isMA?'#1a1a1a':'#bbb'}" id="ps-${p.id}-cost">${cost}</td>
+      <td style="text-align:center"><button onclick="removePartner(${p.id})"
+        style="background:none;border:none;cursor:pointer;color:#ccc;font-size:15px;padding:1px 5px;border-radius:3px;line-height:1"
+        onmouseenter="this.style.color='#A32D2D'" onmouseleave="this.style.color='#ccc'">×</button></td>
+    </tr>`;
+  }).join('');
+  // Footer total
+  const total=partners.filter(p=>p.isMA).reduce((a,p)=>a+p.maPrice*p.maPct/100,0);
+  if(ft) ft.innerHTML=`<tr class="tot-row"><td colspan="6">Total M&A investment</td><td style="text-align:right;padding-right:8px;color:#0F6E56;font-weight:500;font-size:12px" id="ps-ma-total">${total>0?fmt(total):'—'}</td><td></td></tr>`;
+  updateMATotals();
+}
+
+function renderPV(){
+  const tb=document.getElementById('pv-body');const ft=document.getElementById('pv-foot');if(!tb)return;
+  if(partners.length===0){
+    tb.innerHTML=`<tr><td colspan="17" style="text-align:center;color:#bbb;padding:20px;font-size:12px">Thêm đối tác ở bảng phía trên</td></tr>`;
+    if(ft)ft.innerHTML='';return;
+  }
+  tb.innerHTML=partners.map(p=>{
+    const cnt=p.months.filter(Boolean).length;
+    const mo=cnt>0&&p.annual?p.annual/cnt:0;
+    const moCells=Array.from({length:12},(_,mi)=>
+      `<td style="text-align:center"><input type="checkbox" ${p.months[mi]?'checked':''}
+        onchange="setPMonth(${p.id},${mi},this.checked)"
+        style="width:14px;height:14px;cursor:pointer;accent-color:#7F77DD;margin:0"></td>`
+    ).join('');
+    return`<tr>
+      <td style="font-size:12px;font-weight:500;color:#1a1a1a" id="pv-${p.id}-lbl">${p.name||'—'}</td>
+      <td><span id="pv-${p.id}-seg"
+        style="font-size:11px;padding:2px 7px;border-radius:3px;background:${SEG_BG[p.segment]};color:${SEG_CLR[p.segment]}">${SEG_LABEL[p.segment]}</span></td>
+      <td><input type="number" id="pv-${p.id}-ann" value="${p.annual||''}" min="0" step="500"
+        oninput="setPField(${p.id},'annual',this.value);updateMonthlyCell(${p.id})"
+        style="width:78px;text-align:right;font-size:12px;border:none;border-bottom:1px solid #E3E2DE;background:transparent;padding:2px 3px;color:#1a1a1a"></td>
+      <td><input type="number" id="pv-${p.id}-out" value="${p.outpct!==null&&p.outpct!==undefined?p.outpct:''}" placeholder="—" min="0" max="100" step="5"
+        oninput="setPField(${p.id},'outpct',this.value===''?null:this.value)"
+        title="Outreach % riêng. Để trống = dùng global rate"
+        style="width:52px;text-align:right;font-size:12px;border:none;border-bottom:1px solid #E3E2DE;background:transparent;padding:2px 3px;color:#1a1a1a"></td>
+      ${moCells}
+      <td style="text-align:right;font-size:12px;color:#888;padding-right:4px;font-variant-numeric:tabular-nums" id="pv-${p.id}-mo">${mo>0?fmtN(mo)+'/mo':'—'}</td>
+    </tr>`;
+  }).join('');
+  // Footer
+  const totAnn=partners.reduce((a,p)=>a+p.annual,0);
+  if(ft) ft.innerHTML=`<tr class="tot-row"><td colspan="2">Total annual screenings</td><td id="pv-tot-ann" style="text-align:right;padding-right:8px;color:#0F6E56;font-weight:500;font-size:12px">${totAnn>0?fmtN(totAnn):'—'}</td><td></td>${Array.from({length:12},()=>'<td></td>').join('')}<td></td></tr>`;
+}
+
+function getPartnerVolumes(){
+  const schoolVols=Array(12).fill(0);
+  const factoryVols=Array(12).fill(0);
+  const corpVols=Array(12).fill(0);
+  partners.forEach(p=>{
+    if(!p.annual)return;
+    const active=p.months.map((on,mi)=>on?mi:-1).filter(mi=>mi>=0);
+    if(!active.length)return;
+    const mv=p.annual/active.length;
+    active.forEach(mi=>{
+      if(p.segment==='school') schoolVols[mi]+=mv;
+      else if(p.segment==='factory') factoryVols[mi]+=mv;
+      else corpVols[mi]+=mv;
+    });
+  });
+  return{schoolVols,factoryVols,corpVols};
+}
+
+// Per-partner outreach: returns {s,f,c,total} each Array(12)
+// Each partner uses its own outpct if set, else falls back to globalOutpct
+function computeMonthlyOutreach(globalOutpct, p){
+  const s=Array(12).fill(0), f=Array(12).fill(0), c=Array(12).fill(0);
+  partners.forEach(pt=>{
+    if(!pt.annual)return;
+    const active=pt.months.map((on,mi)=>on?mi:-1).filter(mi=>mi>=0);
+    if(!active.length)return;
+    const mv=pt.annual/active.length;
+    const rate=(pt.outpct!==null&&pt.outpct!==undefined?pt.outpct:globalOutpct)/100;
+    const feeRate=pt.segment==='school'?p.sf:pt.segment==='factory'?p.ff:p.cf;
+    active.forEach(mi=>{
+      if(pt.segment==='school') s[mi]+=mv*feeRate*rate;
+      else if(pt.segment==='factory') f[mi]+=mv*feeRate*rate;
+      else c[mi]+=mv*feeRate*rate;
+    });
+  });
+  const total=s.map((v,i)=>v+f[i]+c[i]);
+  return{s,f,c,total};
+}
+
+function buildPartnerTable(){renderPS();renderPV();}
+
+function updatePVFooter(){
+  const totAnn=partners.reduce((a,p)=>a+(p.annual||0),0);
+  s('pv-tot-ann',totAnn>0?fmtN(totAnn):'—');
+}
+
+function updatePVHeader(){
+  const ths=document.querySelectorAll('#pv-tbl thead th');
+  // columns: Partner(0), Segment(1), Annual(2), Outreach%(3), M0-M11(4-15), /tháng(16)
+  for(let i=0;i<12;i++){if(ths[4+i])ths[4+i].textContent=moLabel(i);}
+}
+
+const CAL_MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function moLabel(i){const sm=(Math.round(v('i-startmo'))||1)-1;return CAL_MONTHS[(sm+i)%12];}
+
+function v(id){return parseFloat(document.getElementById(id).value)||0}
+function s(id,txt){const el=document.getElementById(id);if(el)el.textContent=txt}
+function clr(n){return n>=0?'#0F6E56':'#A32D2D'}
+function fmt(n){
+  const a=Math.abs(n),sg=n<0?'-':'';
+  if(a>=1000000)return sg+'$'+(a/1000000).toFixed(2)+'M';
+  if(a>=1000)return sg+'$'+Math.round(a/1000)+'K';
+  return sg+'$'+Math.round(a)
+}
+function fmtD(n){return(n>=0?'$':'-$')+Math.abs(n).toFixed(2)}
+function fmtN(n){return Math.abs(n)>=1000?Math.round(n/1000)+'K':Math.round(n).toLocaleString()}
+function fmtPct(n){return(n>=0?'+':'')+Math.round(n)+'%'}
+function pct(part,whole){return whole>0?Math.round(part/whole*100)+'%':'—'}
+
+function staffCost(){
+  let total=0;
+  ROLES.forEach(r=>{
+    const ann=r.n*r.sal*12;
+    s(r.id+'-ann',fmt(ann));
+    total+=ann;
+  });
+  s('hc-total',fmt(total));
+  return total;
+}
+
+function calcRevSeg(sv,fv,cv,p){
+  // School
+  const sfee=sv*p.sf, shosp=sv*(p.shcvr/100)*p.shrev;
+  // Factory
+  const ffee=fv*p.ff, fonsite=fv*(p.focvr/100)*p.forev, fhosp=fv*(p.fhcvr/100)*p.fhrev;
+  // Corporate
+  const cfee=cv*p.cf, consite=cv*(p.cocvr/100)*p.corev, chosp=cv*(p.cohcvr/100)*p.cohrev;
+  return{sv,fv,cv,
+    sfee,shosp, sr:sfee+shosp,
+    ffee,fonsite,fhosp, fr:ffee+fonsite+fhosp,
+    cfee,consite,chosp, cr:cfee+consite+chosp,
+    feeRev:sfee+ffee+cfee}
+}
+
+// outreachOvr: optional {s,f,c} with exact $ amounts per segment (from computeMonthlyOutreach)
+function calcCosts(r,staffAnn,ovhdAnn,p,outreachOvr){
+  const logistic=r.feeRev*(p.logpct/100);
+  const hasFR=r.feeRev>0;
+  const sFrac=hasFR?r.sfee/r.feeRev:1/3;
+  const fFrac=hasFR?r.ffee/r.feeRev:1/3;
+  const cFrac=1-sFrac-fFrac;
+  let outreach,cout_s,cout_f,cout_c;
+  if(outreachOvr){
+    cout_s=outreachOvr.s||0; cout_f=outreachOvr.f||0; cout_c=outreachOvr.c||0;
+    outreach=cout_s+cout_f+cout_c;
+  } else {
+    outreach=r.feeRev*(p.outpct/100);
+    cout_s=outreach*sFrac; cout_f=outreach*fFrac; cout_c=outreach*cFrac;
+  }
+  const totalCost=outreach+logistic+staffAnn+ovhdAnn;
+  return{outreach,logistic,staffAnn,ovhdAnn,totalCost,
+    cout_s, cout_f, cout_c,
+    clog_s:logistic*sFrac, clog_f:logistic*fFrac, clog_c:logistic*cFrac,
+    covhd_s:ovhdAnn*sFrac, covhd_f:ovhdAnn*fFrac, covhd_c:ovhdAnn*cFrac}
+}
+
+
+let moChartInst=null, mixChartInst=null;
+
+function updateCharts(monthlyData, revMix){
+  const labels=Array.from({length:12},(_,i)=>moLabel(i));
+  if(moChartInst){
+    moChartInst.data.labels=labels;
+    moChartInst.data.datasets[0].data=monthlyData.schRevs;
+    moChartInst.data.datasets[1].data=monthlyData.facRevs;
+    moChartInst.data.datasets[2].data=monthlyData.corRevs;
+    moChartInst.data.datasets[3].data=monthlyData.ebitdas;
+    moChartInst.update('none');
+  } else {
+    moChartInst=new Chart(document.getElementById('moChart'),{
+      data:{labels,datasets:[
+        {type:'bar',label:'School',data:monthlyData.schRevs,backgroundColor:'rgba(29,158,117,.55)',stack:'rev'},
+        {type:'bar',label:'Factory',data:monthlyData.facRevs,backgroundColor:'rgba(127,119,221,.55)',stack:'rev'},
+        {type:'bar',label:'Corporate',data:monthlyData.corRevs,backgroundColor:'rgba(232,136,59,.55)',stack:'rev'},
+        {type:'line',label:'EBITDA',data:monthlyData.ebitdas,borderColor:'#1a1a1a',backgroundColor:'transparent',
+          borderWidth:2,pointRadius:3,pointBackgroundColor:'#1a1a1a',tension:.3,yAxisID:'y2'}
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:true,position:'top',labels:{font:{size:11},color:'#888',boxWidth:10,padding:14}},
+          tooltip:{mode:'index',intersect:false,callbacks:{label:ctx=>` ${ctx.dataset.label}: ${fmt(ctx.raw)}`}}},
+        scales:{
+          x:{grid:{color:'rgba(0,0,0,.04)'},ticks:{font:{size:11},color:'#bbb'}},
+          y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{font:{size:11},color:'#bbb',callback:v=>fmt(v)},position:'left'},
+          y2:{grid:{display:false},ticks:{font:{size:11},color:'#bbb',callback:v=>fmt(v)},position:'right'}
+        }
+      }
+    });
+  }
+
+  const mixColors=['#1D9E75','#7F77DD','#E8883B'];
+  const mixLabels=['School','Factory','Corporate'];
+  // Center-text plugin reads LIVE chart data — no stale closure
+  const centerPlugin={id:'centerText',afterDraw(chart){
+    if(chart.config.type!=='doughnut')return;
+    const liveData=chart.data.datasets[0].data;
+    const liveTotal=liveData.reduce((a,b)=>a+(b||0),0);
+    const ctx=chart.ctx,{width,height}=chart;
+    ctx.save();
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.font='600 13px -apple-system,sans-serif';ctx.fillStyle='#1a1a1a';
+    ctx.fillText(fmt(liveTotal),width/2,height/2-9);
+    ctx.font='11px -apple-system,sans-serif';ctx.fillStyle='#bbb';
+    ctx.fillText('Total rev',width/2,height/2+9);
+    ctx.restore();
+  }};
+  if(mixChartInst){
+    mixChartInst.data.datasets[0].data=revMix;
+    mixChartInst.update();
+  } else {
+    mixChartInst=new Chart(document.getElementById('mixChart'),{
+      type:'doughnut',
+      data:{labels:mixLabels,datasets:[{data:revMix,backgroundColor:mixColors,borderWidth:0,hoverOffset:4}]},
+      options:{responsive:true,maintainAspectRatio:false,cutout:'62%',
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>{
+          const d=ctx.chart.data.datasets[0].data;
+          const t=d.reduce((a,b)=>a+(b||0),0)||1;
+          return` ${ctx.label}: ${fmt(ctx.raw)} · ${Math.round(ctx.raw/t*100)}%`;
+        }}}}},
+      plugins:[centerPlugin]
+    });
+  }
+
+  const total2=revMix.reduce((a,b)=>a+b,0)||1;
+  document.getElementById('mix-legend').innerHTML=mixLabels.map((l,i)=>{
+    const pctVal=Math.round(revMix[i]/total2*100);
+    return`<div style="display:flex;align-items:center;gap:7px;padding:4px 0;border-bottom:.5px solid #F5F4F0">
+      <span style="width:10px;height:10px;border-radius:2px;background:${mixColors[i]};flex-shrink:0"></span>
+      <span style="font-weight:500;color:#555;min-width:68px">${l}</span>
+      <span style="font-size:13px;font-weight:500;font-variant-numeric:tabular-nums">${fmt(revMix[i])}</span>
+      <span style="font-size:12px;color:#bbb">·</span>
+      <span style="font-size:12px;font-weight:500;color:${mixColors[i]}">${pctVal}%</span>
+      <div style="flex:1;height:4px;border-radius:2px;background:#F0EFF8;overflow:hidden"><div style="width:${pctVal}%;height:100%;background:${mixColors[i]}"></div></div>
+    </div>`}).join('');
+}
+
+function buildMonthlyTable(schoolVols,factoryVols,corpVols,p,staffAnn,ovhdAnn,outreachByMonth){
+  const QNAMES={0:'Q1',3:'Q2',6:'Q3',9:'Q4'};
+
+  let hHtml=`<tr><th class="lbl"></th>`;
+  for(let i=0;i<12;i++){
+    hHtml+=`<th class="${i%3===0?'q-hd':''}">${moLabel(i)}${i%3===0?` <span style="font-size:10px;opacity:.6">${QNAMES[i]}</span>`:''}</th>`;
+  }
+  hHtml+=`<th class="tot-col">Total</th></tr>`;
+  document.getElementById('mo-head').innerHTML=hHtml;
+
+  const months=schoolVols.map((sv,i)=>{
+    const fv=factoryVols[i],cv=corpVols[i];
+    const r=calcRevSeg(sv,fv,cv,p);
+    const rev=r.sr+r.fr+r.cr;
+    const ovrr=outreachByMonth?{s:outreachByMonth.s[i],f:outreachByMonth.f[i],c:outreachByMonth.c[i]}:undefined;
+    const c=calcCosts(r,staffAnn/12,ovhdAnn/12,p,ovrr);
+    return{sv,fv,cv,vol:sv+fv+cv,r,rev,c,ebitda:rev-c.totalCost};
+  });
+
+  function makeRow(label,cls,fn,colorFn){
+    let h=`<tr class="${cls}"><td class="lbl">${label}</td>`;
+    let tot=0;
+    months.forEach((m,i)=>{
+      const val=fn(m);
+      tot+=val||0;
+      const disp=val===0?'—':fmt(val);
+      const style=colorFn?` style="color:${colorFn(val)}"`:'';
+      h+=`<td class="${i%3===0&&!colorFn?'q-col':''}"${style}>${disp}</td>`;
+    });
+    const totStyle=colorFn?` style="color:${colorFn(tot)}"`:'';
+    h+=`<td class="tot-col"${totStyle}>${tot===0?'—':fmt(tot)}</td></tr>`;
+    return h;
+  }
+
+  function makeRowN(label,cls,fn){
+    let h=`<tr class="${cls}"><td class="lbl">${label}</td>`;
+    let tot=0;
+    months.forEach((m,i)=>{
+      const val=fn(m);tot+=val||0;
+      h+=`<td class="${i%3===0?'q-col':''}">${fmtN(val)}</td>`;
+    });
+    h+=`<td class="tot-col">${fmtN(tot)}</td></tr>`;
+    return h;
+  }
+
+  let bHtml='';
+  bHtml+=`<tr class="sec-row"><td class="lbl" colspan="14">Volume</td></tr>`;
+  bHtml+=makeRowN('Screenings','bold-row',m=>m.vol);
+  bHtml+=makeRowN('↳ School','sub-row',m=>m.sv);
+  bHtml+=makeRowN('↳ Factory','sub-row',m=>m.fv);
+  bHtml+=makeRowN('↳ Corporate','sub-row',m=>m.cv);
+
+  bHtml+=`<tr class="sec-row"><td class="lbl" colspan="14">Revenue</td></tr>`;
+  bHtml+=makeRow('School revenue','sub-row bold-row',m=>m.r.sr);
+  bHtml+=makeRow('↳ Screening fee','sub-row',m=>m.r.sfee);
+  bHtml+=makeRow('↳ Hospital referral','sub-row',m=>m.r.shosp);
+  bHtml+=makeRow('Factory revenue','sub-row bold-row',m=>m.r.fr);
+  bHtml+=makeRow('↳ Screening fee','sub-row',m=>m.r.ffee);
+  bHtml+=makeRow('↳ On-site conversion','sub-row',m=>m.r.fonsite);
+  bHtml+=makeRow('↳ Hospital referral','sub-row',m=>m.r.fhosp);
+  bHtml+=makeRow('Corporate revenue','sub-row bold-row',m=>m.r.cr);
+  bHtml+=makeRow('↳ Screening fee','sub-row',m=>m.r.cfee);
+  bHtml+=makeRow('↳ On-site conversion','sub-row',m=>m.r.consite);
+  bHtml+=makeRow('↳ Hospital referral','sub-row',m=>m.r.chosp);
+  bHtml+=makeRow('Total revenue','bold-row',m=>m.rev);
+
+  bHtml+=`<tr class="sec-row"><td class="lbl" colspan="14">Costs</td></tr>`;
+  bHtml+=makeRow('Outreach','sub-row',m=>m.c.outreach);
+  bHtml+=makeRow('Logistics','sub-row',m=>m.c.logistic);
+  bHtml+=makeRow('Staff','sub-row',m=>m.c.staffAnn);
+  bHtml+=makeRow('Fixed overhead','sub-row',m=>m.c.ovhdAnn);
+  bHtml+=makeRow('Total costs','bold-row',m=>m.c.totalCost);
+
+  bHtml+=`<tr style="height:4px"><td colspan="14"></td></tr>`;
+
+  let cumE=0;
+  let eHtml=`<tr class="e-row"><td class="lbl">EBITDA</td>`;
+  let totE=0;
+  months.forEach((m,i)=>{
+    totE+=m.ebitda;
+    eHtml+=`<td class="${i%3===0?'q-col':''}" style="color:${clr(m.ebitda)}">${fmt(m.ebitda)}</td>`;
+  });
+  eHtml+=`<td class="tot-col" style="color:${clr(totE)}">${fmt(totE)}</td></tr>`;
+
+  let cumHtml=`<tr class="e-row"><td class="lbl">Cumulative EBITDA</td>`;
+  let beFound=false;
+  months.forEach((m,i)=>{
+    cumE+=m.ebitda;
+    cumHtml+=`<td class="${i%3===0?'q-col':''}" style="color:${clr(cumE)}">${fmt(cumE)}</td>`;
+  });
+  cumHtml+=`<td class="tot-col" style="color:${clr(cumE)}">${fmt(cumE)}</td></tr>`;
+
+  document.getElementById('mo-body').innerHTML=bHtml+eHtml+cumHtml;
+  return months;
+}
+
+function calcAnnualFromMonthly(schoolVols,factoryVols,corpVols,p,staffAnn,ovhdAnn,outreachByMonth){
+  let sfee=0,shosp=0,ffee=0,fonsite=0,fhosp=0,cfee=0,consite=0,chosp=0;
+  for(let i=0;i<12;i++){
+    const r=calcRevSeg(schoolVols[i],factoryVols[i],corpVols[i],p);
+    sfee+=r.sfee;shosp+=r.shosp;ffee+=r.ffee;fonsite+=r.fonsite;fhosp+=r.fhosp;
+    cfee+=r.cfee;consite+=r.consite;chosp+=r.chosp;
+  }
+  const sr=sfee+shosp,fr=ffee+fonsite+fhosp,cr=cfee+consite+chosp,rev=sr+fr+cr;
+  const feeRev=sfee+ffee+cfee;
+  const annOvr=outreachByMonth?{
+    s:outreachByMonth.s.reduce((a,b)=>a+b,0),
+    f:outreachByMonth.f.reduce((a,b)=>a+b,0),
+    c:outreachByMonth.c.reduce((a,b)=>a+b,0)
+  }:undefined;
+  const c=calcCosts({sfee,ffee,cfee,feeRev},staffAnn,ovhdAnn,p,annOvr);
+  const ebitda=rev-c.totalCost;
+  return{sfee,shosp,ffee,fonsite,fhosp,cfee,consite,chosp,sr,fr,cr,rev,c,ebitda,
+    totalVol:schoolVols.reduce((a,b)=>a+b,0)+factoryVols.reduce((a,b)=>a+b,0)+corpVols.reduce((a,b)=>a+b,0),
+    schVol:schoolVols.reduce((a,b)=>a+b,0),
+    facVol:factoryVols.reduce((a,b)=>a+b,0),
+    corVol:corpVols.reduce((a,b)=>a+b,0),
+    margin:rev>0?ebitda/rev*100:0}
+}
+
+function calc(){
+  const staffAnn=staffCost();
+  const p={
+    sf:v('i-sf'),shcvr:v('i-shcvr'),shrev:v('i-shrev'),
+    ff:v('i-ff'),focvr:v('i-focvr'),forev:v('i-forev'),fhcvr:v('i-fhcvr'),fhrev:v('i-fhrev'),
+    cf:v('i-cf'),cocvr:v('i-cocvr'),corev:v('i-corev'),cohcvr:v('i-cohcvr'),cohrev:v('i-cohrev'),
+    outpct:v('i-outpct'),logpct:v('i-logpct')
+  };
+  const {schoolVols,factoryVols,corpVols}=getPartnerVolumes();
+  const totalVol=schoolVols.reduce((a,b)=>a+b,0)+factoryVols.reduce((a,b)=>a+b,0)+corpVols.reduce((a,b)=>a+b,0);
+
+  const ovhdAnn=overheadCost();
+  const outreachByMonth=computeMonthlyOutreach(p.outpct,p);
+  const m=calcAnnualFromMonthly(schoolVols,factoryVols,corpVols,p,staffAnn,ovhdAnn,outreachByMonth);
+  const rev=m.rev;
+
+  // Update cost pill labels
+  const hasCustomOut=partners.some(pt=>pt.outpct!==null&&pt.outpct!==undefined);
+  const lbo=document.getElementById('lbl-outreach');if(lbo)lbo.textContent=hasCustomOut?'per-partner':p.outpct+'% of fee';
+  const lbl=document.getElementById('lbl-logistic');if(lbl)lbl.textContent=p.logpct+'% of fee';
+  const lbh=document.getElementById('lbl-overhead');if(lbh)lbh.textContent=fmt(ovhdAnn/12)+'/mo';
+
+  // KPIs
+  s('k-vol',Math.round(totalVol).toLocaleString());
+  s('k-vol-sub',fmtN(m.schVol)+' school\n'+fmtN(m.facVol)+' factory · '+fmtN(m.corVol)+' corp');
+  s('k-rev',fmt(rev));
+  s('k-rev-sub',fmtD(rev/totalVol)+' / screening avg');
+  const schRPS=m.schVol>0?m.sr/m.schVol:0, facRPS=m.facVol>0?m.fr/m.facVol:0, corRPS=m.corVol>0?m.cr/m.corVol:0;
+  s('k-rps',fmtD(rev/totalVol||0));
+  s('k-rps-sub',fmtD(schRPS)+' S · '+fmtD(facRPS)+' F · '+fmtD(corRPS)+' C');
+  s('s-rps',fmtD(schRPS));s('f-rps',fmtD(facRPS));s('c-rps',fmtD(corRPS));
+  const ke=document.getElementById('k-ebitda');if(ke){ke.textContent=fmt(m.ebitda);ke.style.color=clr(m.ebitda)}
+  const km=document.getElementById('k-margin');if(km){km.textContent=fmtPct(m.margin)+' margin';km.style.color=clr(m.margin)}
+
+  // P&L Revenue
+  s('rs1',fmt(m.sfee));s('rf1',fmt(m.ffee));s('rc1',fmt(m.cfee));s('rt1',fmt(m.sfee+m.ffee+m.cfee));s('rp1',pct(m.sfee+m.ffee+m.cfee,rev));
+  s('rf2',fmt(m.fonsite));s('rc2',fmt(m.consite));s('rt2',fmt(m.fonsite+m.consite));s('rp2',pct(m.fonsite+m.consite,rev));
+  s('rs3',fmt(m.shosp));s('rf3',fmt(m.fhosp));s('rc3',fmt(m.chosp));s('rt3',fmt(m.shosp+m.fhosp+m.chosp));s('rp3',pct(m.shosp+m.fhosp+m.chosp,rev));
+  s('rs-tot',fmt(m.sr));s('rf-tot',fmt(m.fr));s('rc-tot',fmt(m.cr));s('r-tot',fmt(rev));
+
+  // P&L Costs — staff & overhead allocated proportionally by revenue share
+  const staffFracS=rev>0?m.sr/rev:1/3, staffFracF=rev>0?m.fr/rev:1/3, staffFracC=rev>0?m.cr/rev:1/3;
+
+  s('cout-s',fmt(m.c.cout_s));s('cout-f',fmt(m.c.cout_f));s('cout-c',fmt(m.c.cout_c));s('cout-tot',fmt(m.c.outreach));s('cp-out',pct(m.c.outreach,rev));
+  s('clog-s',fmt(m.c.clog_s));s('clog-f',fmt(m.c.clog_f));s('clog-c',fmt(m.c.clog_c));s('clog-tot',fmt(m.c.logistic));s('cp-log',pct(m.c.logistic,rev));
+  s('cstaff-s',fmt(staffAnn*staffFracS));s('cstaff-f',fmt(staffAnn*staffFracF));s('cstaff-c',fmt(staffAnn*staffFracC));
+  s('c-staff',fmt(staffAnn));s('cp-staff',pct(staffAnn,rev));
+  s('covhd-s',fmt(m.c.covhd_s));s('covhd-f',fmt(m.c.covhd_f));s('covhd-c',fmt(m.c.covhd_c));
+  s('covhd-tot',fmt(ovhdAnn));s('cp-ovhd',pct(ovhdAnn,rev));
+  s('ctot-s',fmt(m.c.cout_s+m.c.clog_s+m.c.covhd_s+(staffAnn*staffFracS)));
+  s('ctot-f',fmt(m.c.cout_f+m.c.clog_f+m.c.covhd_f+(staffAnn*staffFracF)));
+  s('ctot-c',fmt(m.c.cout_c+m.c.clog_c+m.c.covhd_c+(staffAnn*staffFracC)));
+  s('c-tot',fmt(m.c.totalCost));s('cp-tot',pct(m.c.totalCost,rev));
+
+  // EBITDA
+  const ec=document.getElementById('ebitda-cell');if(ec){ec.textContent=fmt(m.ebitda);ec.style.color=clr(m.ebitda)}
+  const ep=document.getElementById('ebitda-pct');if(ep){ep.textContent=fmtPct(m.margin);ep.style.color=clr(m.margin)}
+  const es=m.sr-m.c.cout_s-m.c.clog_s-m.c.covhd_s-(staffAnn*staffFracS);
+  const ef=m.fr-m.c.cout_f-m.c.clog_f-m.c.covhd_f-(staffAnn*staffFracF);
+  const ecc=m.cr-m.c.cout_c-m.c.clog_c-m.c.covhd_c-(staffAnn*staffFracC);
+  s('ebitda-s',fmt(es));document.getElementById('ebitda-s').style.color=clr(es);
+  s('ebitda-f',fmt(ef));document.getElementById('ebitda-f').style.color=clr(ef);
+  s('ebitda-c',fmt(ecc));document.getElementById('ebitda-c').style.color=clr(ecc);
+
+  // Sensitivity — scale all monthly vols proportionally
+  [0.8,1.0,1.2].forEach((mult,i)=>{
+    const scaledOut={
+      s:outreachByMonth.s.map(v=>v*mult),f:outreachByMonth.f.map(v=>v*mult),
+      c:outreachByMonth.c.map(v=>v*mult),total:outreachByMonth.total.map(v=>v*mult)
+    };
+    const sm=calcAnnualFromMonthly(schoolVols.map(sv=>sv*mult),factoryVols.map(fv=>fv*mult),corpVols.map(cv=>cv*mult),p,staffAnn,ovhdAnn,scaledOut);
+    s('sv'+i,Math.round(totalVol*mult/1000)+'K');
+    s('sr'+i,fmt(sm.rev));
+    const ee=document.getElementById('se'+i);if(ee){ee.textContent=fmt(sm.ebitda);ee.style.color=clr(sm.ebitda)}
+    const me=document.getElementById('sm'+i);if(me){me.textContent=fmtPct(sm.margin);me.style.color=clr(sm.margin)}
+  });
+
+  // Sync pv-tbl header month labels with current start month
+  updatePVHeader();
+
+  // Monthly table
+  const months=buildMonthlyTable(schoolVols,factoryVols,corpVols,p,staffAnn,ovhdAnn,outreachByMonth);
+
+  // Break-even
+  let cum=0,be='Never';
+  months.forEach((mo,i)=>{cum+=mo.ebitda;if(be==='Never'&&cum>=0)be='M'+(i+1)});
+  s('k-be',be);
+
+  // Charts
+  updateCharts(
+    {schRevs:months.map(mo=>Math.round(mo.r.sr)),
+     facRevs:months.map(mo=>Math.round(mo.r.fr)),
+     corRevs:months.map(mo=>Math.round(mo.r.cr)),
+     ebitdas:months.map(mo=>Math.round(mo.ebitda))},
+    [Math.round(m.sr),Math.round(m.fr),Math.round(m.cr)]
+  );
+}
+
+function showTab(tab){
+  document.getElementById('tab-model').style.display=tab==='model'?'':'none';
+  document.getElementById('tab-cashflow').style.display=tab==='cashflow'?'':'none';
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>{
+    b.classList.toggle('active',(i===0&&tab==='model')||(i===1&&tab==='cashflow'));
+  });
+  if(tab==='cashflow') calcCF();
+}
+
+function calcCF(){
+  const staffAnn=ROLES.reduce((a,r)=>a+v(r.id+'-n')*v(r.id+'-s')*12,0);
+  const p={
+    sf:v('i-sf'),shcvr:v('i-shcvr'),shrev:v('i-shrev'),
+    ff:v('i-ff'),focvr:v('i-focvr'),forev:v('i-forev'),fhcvr:v('i-fhcvr'),fhrev:v('i-fhrev'),
+    cf:v('i-cf'),cocvr:v('i-cocvr'),corev:v('i-corev'),cohcvr:v('i-cohcvr'),cohrev:v('i-cohrev'),
+    outpct:v('i-outpct'),logpct:v('i-logpct')
+  };
+  const ovhdAnn=OVHD.reduce((a,o)=>a+o.mo*12,0);
+  const {schoolVols,factoryVols,corpVols}=getPartnerVolumes();
+  const outreachByMonth=computeMonthlyOutreach(p.outpct,p);
+
+  // M&A costs from partner setup (per partner, per payment month)
+  const maCostByMonth=Array(12).fill(0);
+  partners.filter(p=>p.isMA).forEach(p=>{
+    const mo=Math.max(1,Math.min(12,Math.round(p.maMo||1)));
+    maCostByMonth[mo-1]+=p.maPrice*p.maPct/100;
+  });
+  const totalMA=maCostByMonth.reduce((a,b)=>a+b,0);
+  updateMATotals();
+
+  const invTotal=v('cf-inv');
+  const eqMo=Math.round(v('cf-eq-mo')), eqAmt=v('cf-eq');
+  const techMo=Math.round(v('cf-tech-mo')), techAmt=v('cf-tech');
+  const totalCapex=totalMA+eqAmt+techAmt;
+
+  // Build monthly cashflow
+  const months=schoolVols.map((sv,i)=>{
+    const fv=factoryVols[i],cv=corpVols[i];
+    const r=calcRevSeg(sv,fv,cv,p);
+    const outreach=outreachByMonth.total[i];
+    const logistic=r.feeRev*(p.logpct/100);
+    const staff=staffAnn/12;
+    const overhead=ovhdAnn/12;
+    const revenueCollected=r.sfee+r.ffee+r.cfee+r.fonsite+r.consite+r.shosp+r.fhosp+r.chosp;
+    const opCostPaid=outreach+logistic+staff+overhead;
+    const opCF=revenueCollected-opCostPaid;
+    let capex=maCostByMonth[i]; // M&A from partner setup
+    if(i+1===eqMo) capex+=eqAmt;
+    if(i+1===techMo) capex+=techAmt;
+    const netCF=opCF-capex;
+    return{sv,fv,r,revenueCollected,opCostPaid,outreach,logistic,staff,overhead,opCF,capex,netCF,maInMonth:maCostByMonth[i]};
+  });
+
+  // Opening cash = investment
+  let cash=invTotal;
+  let minCash=cash,minMo=0,positiveMo='Never',cumPosMo='Never';
+  let cumCF=0;
+  const cashFlow=months.map((m,i)=>{
+    const open=cash;
+    cash+=m.netCF;
+    cumCF+=m.netCF;
+    if(cash<minCash){minCash=cash;minMo=i+1;}
+    if(positiveMo==='Never'&&m.opCF>=0) positiveMo='M'+(i+1);
+    if(cumPosMo==='Never'&&cumCF>=0) cumPosMo='M'+(i+1);
+    return{...m,open,close:cash,cumCF};
+  });
+
+  // KPIs
+  s('cf-k-inv',fmt(invTotal));
+  const mk=document.getElementById('cf-k-min');if(mk){mk.textContent=fmt(minCash);mk.style.color=clr(minCash);}
+  s('cf-k-min-mo','lowest at M'+minMo);
+  s('cf-k-pos',positiveMo);
+  s('cf-k-cum',cumPosMo);
+  const ek=document.getElementById('cf-k-end');if(ek){ek.textContent=fmt(cashFlow[11].close);ek.style.color=clr(cashFlow[11].close);}
+
+  // Use of funds
+  s('uof-ma',totalMA>0?fmt(totalMA):'—');s('uof-eq',fmt(eqAmt));s('uof-tech',fmt(techAmt));
+  const wcCalc=invTotal-totalCapex;
+  const wcel=document.getElementById('uof-wc');if(wcel){wcel.textContent=fmt(wcCalc);wcel.style.color=wcCalc>=0?'#1a1a1a':'#A32D2D';}
+  // Stacked bar
+  const items=[{v:totalMA,c:'#1D9E75',l:'M&A'},{v:eqAmt,c:'#7F77DD',l:'Equipment'},{v:techAmt,c:'#AFA9EC',l:'Tech'},{v:Math.max(0,wcCalc),c:'#E8E7E3',l:'Working capital'}];
+  const total=items.reduce((a,i)=>a+i.v,0)||1;
+  document.getElementById('uof-stacked-bar').innerHTML=items.map(i=>`<div style="flex:${i.v/total};background:${i.c};min-width:${i.v>0?2:0}px"></div>`).join('');
+  document.getElementById('uof-legend').innerHTML=items.filter(i=>i.v>0).map(i=>`<span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:${i.c}"></span>${i.l}: ${fmt(i.v)}</span>`).join('');
+
+  // Build cashflow table
+  const QNAMES={0:'Q1',3:'Q2',6:'Q3',9:'Q4'};
+  let hHtml=`<tr><th class="lbl"></th>`;
+  for(let i=0;i<12;i++) hHtml+=`<th class="${i%3===0?'q-hd':''}">${moLabel(i)}${i%3===0?` <span style="font-size:10px;opacity:.6">${QNAMES[i]}</span>`:''}</th>`;
+  hHtml+=`<th class="tot-col">Total</th></tr>`;
+  document.getElementById('cf-head').innerHTML=hHtml;
+
+  function cfRow(label,cls,fn,totFn,colorFn){
+    let h=`<tr class="${cls}"><td class="lbl">${label}</td>`;
+    let tot=0;
+    cashFlow.forEach((m,i)=>{
+      const val=fn(m,i);tot+=val||0;
+      const disp=val===0?'—':fmt(val);
+      const style=colorFn?` style="color:${colorFn(val)}"`:'';
+      h+=`<td class="${i%3===0&&!colorFn?'q-col':''}"${style}>${disp}</td>`;
+    });
+    const ts=totFn?totFn():tot;
+    const totStyle=colorFn?` style="color:${colorFn(ts)}"`:'';
+    h+=`<td class="tot-col"${totStyle}>${ts===0?'—':fmt(ts)}</td></tr>`;
+    return h;
+  }
+
+  let bHtml='';
+  bHtml+=`<tr class="sec-row"><td class="lbl" colspan="14">Operating cash flow</td></tr>`;
+  bHtml+=cfRow('Revenue collected','sub-row',m=>m.revenueCollected);
+  bHtml+=cfRow('↳ Screening fees','sub-row',m=>m.r.sfee+m.r.ffee+m.r.cfee);
+  bHtml+=cfRow('↳ On-site conversion','sub-row',m=>m.r.fonsite+m.r.consite);
+  bHtml+=cfRow('↳ Hospital referral','sub-row',m=>m.r.shosp+m.r.fhosp+m.r.chosp);
+  bHtml+=cfRow('Costs paid','sub-row',m=>-m.opCostPaid);
+  bHtml+=cfRow('↳ Outreach','sub-row',m=>-m.outreach);
+  bHtml+=cfRow('↳ Logistics','sub-row',m=>-m.logistic);
+  bHtml+=cfRow('↳ Staff','sub-row',m=>-m.staff);
+  bHtml+=cfRow('↳ Fixed overhead','sub-row',m=>-m.overhead);
+
+  let opTot=cashFlow.reduce((a,m)=>a+m.opCF,0);
+  let opHtml=`<tr class="bold-row"><td class="lbl">Operating CF</td>`;
+  cashFlow.forEach((m,i)=>{opHtml+=`<td class="${i%3===0?'q-col':''}" style="color:${clr(m.opCF)}">${fmt(m.opCF)}</td>`;});
+  opHtml+=`<td class="tot-col" style="color:${clr(opTot)}">${fmt(opTot)}</td></tr>`;
+  bHtml+=opHtml;
+
+  bHtml+=`<tr class="sec-row"><td class="lbl" colspan="14">Investing cash flow</td></tr>`;
+  // Show one M&A line per M&A partner
+  partners.filter(p=>p.isMA).forEach(p=>{
+    const cost=p.maPrice*p.maPct/100;
+    const mo=Math.max(1,Math.min(12,Math.round(p.maMo||1)));
+    bHtml+=cfRow(`↳ M&A ${p.name||'Partner'} (${Math.round(p.maPct)}%)`,'sub-row',(m,mi)=>mi+1===mo?-cost:0);
+  });
+  if(!partners.some(p=>p.isMA)) bHtml+=cfRow('M&A acquisitions','sub-row',()=>0);
+  bHtml+=cfRow('Equipment CapEx','sub-row',(m,i)=>i+1===eqMo?-eqAmt:0);
+  bHtml+=cfRow('Tech / AI build','sub-row',(m,i)=>i+1===techMo?-techAmt:0);
+  let invHtml=`<tr class="bold-row"><td class="lbl">Investing CF</td>`;
+  cashFlow.forEach((m,i)=>{const v=-m.capex;invHtml+=`<td class="${i%3===0?'q-col':''}" style="color:${clr(v)}">${v===0?'—':fmt(v)}</td>`;});
+  invHtml+=`<td class="tot-col" style="color:${clr(-totalCapex)}">${fmt(-totalCapex)}</td></tr>`;
+  bHtml+=invHtml;
+
+  bHtml+=`<tr class="sec-row"><td class="lbl" colspan="14">Financing cash flow</td></tr>`;
+  bHtml+=cfRow('Investment received','sub-row',(m,i)=>i===0?invTotal:0);
+  bHtml+=`<tr style="height:4px"><td colspan="14"></td></tr>`;
+
+  let ncHtml=`<tr class="${cashFlow.some(m=>m.netCF<0)?'hi-row':'hi-row'}"><td class="lbl">Net CF per month</td>`;
+  cashFlow.forEach((m,i)=>{ncHtml+=`<td class="${i%3===0?'q-col':''}" style="color:${clr(m.netCF)}">${fmt(m.netCF)}</td>`;});
+  ncHtml+=`<td class="tot-col">—</td></tr>`;
+  bHtml+=ncHtml;
+
+  let openHtml=`<tr class="hi-row"><td class="lbl">Opening cash balance</td>`;
+  cashFlow.forEach((m,i)=>{openHtml+=`<td class="${i%3===0?'q-col':''}">${fmt(m.open)}</td>`;});
+  openHtml+=`<td class="tot-col">—</td></tr>`;
+  bHtml+=openHtml;
+
+  let closeHtml=`<tr class="hi-row"><td class="lbl" style="font-weight:600">Closing cash balance</td>`;
+  cashFlow.forEach((m,i)=>{closeHtml+=`<td class="${i%3===0?'q-col':''}" style="color:${clr(m.close)};font-weight:500">${fmt(m.close)}</td>`;});
+  closeHtml+=`<td class="tot-col" style="color:${clr(cashFlow[11].close)}">${fmt(cashFlow[11].close)}</td></tr>`;
+  bHtml+=closeHtml;
+
+  document.getElementById('cf-body').innerHTML=bHtml;
+}
+
+// ─── Default partners ──────────────────────────────────────────────
+partners=[
+  {id:0,name:'Happy IDEM',segment:'school',isMA:false,maPrice:100000,maPct:60,maMo:1,
+   annual:35000,months:[false,true,true,true,true,true,false,true,true,true,false,false],outpct:null},
+  {id:1,name:'Vision Spring',segment:'factory',isMA:false,maPrice:100000,maPct:100,maMo:1,
+   annual:8000,months:[true,true,true,true,true,true,false,true,true,true,true,true],outpct:0},
+  {id:2,name:'Ecohealth',segment:'corporate',isMA:false,maPrice:100000,maPct:100,maMo:1,
+   annual:10000,months:[true,true,true,true,true,true,false,true,true,true,true,true],outpct:0},
+  {id:3,name:'Việt Pháp',segment:'corporate',isMA:false,maPrice:100000,maPct:100,maMo:1,
+   annual:20000,months:[true,true,true,true,true,true,false,true,true,true,true,true],outpct:0}
+];
+nextPId=4;
+
+// ─── Admin: Save / Load Defaults via GitHub API ───────────────────────
+const ADMIN_PIN='2026';
+const GH_CONFIG={owner:'tthieu285',repo:'financial-model',branch:'main',path:'defaults.json'};
+const ALL_INPUT_IDS=['i-sf','i-shcvr','i-shrev',
+  'i-ff','i-focvr','i-forev','i-fhcvr','i-fhrev',
+  'i-cf','i-cocvr','i-corev','i-cohcvr','i-cohrev',
+  'i-outpct','i-logpct','i-startmo',
+  'cf-inv','cf-eq','cf-eq-mo','cf-tech','cf-tech-mo'];
+
+async function loadDefaults(){
+  try{
+    const res=await fetch('defaults.json?t='+Date.now());
+    if(!res.ok)return;
+    const state=await res.json();
+    if(state.partners){partners=state.partners;nextPId=state.nextPId??partners.length;}
+    if(state.ROLES){ROLES=state.ROLES;nextRId=state.nextRId??ROLES.length;}
+    if(state.OVHD){OVHD=state.OVHD;nextOId=state.nextOId??OVHD.length;}
+    window._savedInputs=state.inputs||{};
+  }catch(e){console.log('defaults.json not found — using hardcoded defaults');}
+}
+
+function applySavedInputs(){
+  if(!window._savedInputs)return;
+  Object.entries(window._savedInputs).forEach(([id,val])=>{
+    const el=document.getElementById(id);if(el)el.value=val;
+  });
+  window._savedInputs=null;
+}
+
+function openSaveModal(){
+  document.getElementById('pin-modal').style.display='flex';
+  document.getElementById('pin-input').value='';
+  document.getElementById('pin-error').style.display='none';
+  document.getElementById('pat-error').style.display='none';
+  document.getElementById('save-status').style.display='none';
+  document.getElementById('save-confirm-btn').disabled=false;
+  const savedPat=localStorage.getItem('godsEyes_pat')||'';
+  document.getElementById('pat-input').value=savedPat;
+  if(savedPat)document.getElementById('remember-pat').checked=true;
+  setTimeout(()=>document.getElementById('pin-input').focus(),60);
+}
+function closeSaveModal(){document.getElementById('pin-modal').style.display='none';}
+
+function setModalStatus(type,msg){
+  const el=document.getElementById('save-status');
+  const bg={loading:'#F5F5F0',success:'#E8F5F0',error:'#FEF2F2'};
+  const col={loading:'#555',success:'#0F6E56',error:'#A32D2D'};
+  el.style.cssText=`display:block;padding:10px 12px;border-radius:8px;font-size:12px;margin-bottom:12px;background:${bg[type]};color:${col[type]}`;
+  el.textContent=msg;
+  document.getElementById('save-confirm-btn').disabled=(type==='loading');
+}
+
+async function confirmSave(){
+  const pin=document.getElementById('pin-input').value;
+  if(pin!==ADMIN_PIN){document.getElementById('pin-error').style.display='block';return;}
+  document.getElementById('pin-error').style.display='none';
+
+  const pat=document.getElementById('pat-input').value.trim();
+  if(!pat){document.getElementById('pat-error').style.display='block';return;}
+  document.getElementById('pat-error').style.display='none';
+
+  if(document.getElementById('remember-pat').checked){
+    localStorage.setItem('godsEyes_pat',pat);
+  } else {
+    localStorage.removeItem('godsEyes_pat');
+  }
+
+  setModalStatus('loading','⏳ Đang commit lên GitHub...');
+
+  const inputs={};
+  ALL_INPUT_IDS.forEach(id=>{const el=document.getElementById(id);if(el)inputs[id]=el.value;});
+  const state={
+    inputs,
+    partners:JSON.parse(JSON.stringify(partners)),
+    ROLES:JSON.parse(JSON.stringify(ROLES)),
+    OVHD:JSON.parse(JSON.stringify(OVHD)),
+    nextPId,nextRId,nextOId
+  };
+
+  const content=btoa(unescape(encodeURIComponent(JSON.stringify(state,null,2))));
+  const apiUrl=`https://api.github.com/repos/${GH_CONFIG.owner}/${GH_CONFIG.repo}/contents/${GH_CONFIG.path}`;
+  const headers={'Authorization':`token ${pat}`,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'};
+
+  try{
+    let sha=null;
+    const getRes=await fetch(apiUrl,{headers});
+    if(getRes.ok){const d=await getRes.json();sha=d.sha;}
+
+    const body={
+      message:`Update defaults · ${new Date().toLocaleString('vi-VN')}`,
+      content,branch:GH_CONFIG.branch
+    };
+    if(sha)body.sha=sha;
+
+    const putRes=await fetch(apiUrl,{method:'PUT',headers,body:JSON.stringify(body)});
+    if(putRes.ok){
+      setModalStatus('success','✅ Đã lưu! GitHub Pages deploy trong 1–2 phút.');
+      setTimeout(closeSaveModal,3000);
+    } else {
+      const err=await putRes.json();
+      setModalStatus('error','❌ Lỗi GitHub: '+(err.message||putRes.status));
+    }
+  }catch(e){
+    setModalStatus('error','❌ Không kết nối được. Kiểm tra mạng / PAT.');
+  }
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────
+(async()=>{
+  await loadDefaults();
+  buildHC();
+  buildOverhead();
+  buildPartnerTable();
+  applySavedInputs();
+  calc();
+})();
+</script>
+
+<!-- Admin Modal -->
+<div id="pin-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:14px;padding:30px 28px;width:390px;box-shadow:0 24px 64px rgba(0,0,0,.22)">
+    <div style="font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:4px">🔒 Admin — Lưu mặc định</div>
+    <div style="font-size:12px;color:#999;margin-bottom:20px;line-height:1.5">Thông số hiện tại sẽ được commit lên GitHub và áp dụng cho tất cả người dùng.</div>
+
+    <div style="margin-bottom:12px">
+      <div style="font-size:11px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px">PIN Admin</div>
+      <input type="password" id="pin-input" placeholder="Nhập PIN" maxlength="8"
+        style="width:100%;padding:9px 12px;border:1.5px solid #E3E2DE;border-radius:8px;font-size:13px;box-sizing:border-box;outline:none"
+        onfocus="this.style.borderColor='#1a1a1a'" onblur="this.style.borderColor='#E3E2DE'">
+      <div id="pin-error" style="font-size:11px;color:#A32D2D;margin-top:5px;display:none">❌ PIN không đúng.</div>
+    </div>
+
+    <div style="margin-bottom:6px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+        <div style="font-size:11px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:.04em">GitHub Personal Access Token</div>
+        <a href="https://github.com/settings/tokens/new?scopes=public_repo&description=gods-eyes-defaults" target="_blank"
+          style="font-size:11px;color:#7F77DD;text-decoration:none;white-space:nowrap">Tạo PAT →</a>
+      </div>
+      <input type="password" id="pat-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+        style="width:100%;padding:9px 12px;border:1.5px solid #E3E2DE;border-radius:8px;font-size:12px;box-sizing:border-box;outline:none;font-family:monospace"
+        onfocus="this.style.borderColor='#1a1a1a'" onblur="this.style.borderColor='#E3E2DE'"
+        onkeydown="if(event.key==='Enter')confirmSave()">
+      <div id="pat-error" style="font-size:11px;color:#A32D2D;margin-top:5px;display:none">❌ Vui lòng nhập PAT.</div>
+    </div>
+    <label style="display:flex;align-items:center;gap:7px;font-size:12px;color:#888;cursor:pointer;margin-bottom:16px;margin-top:8px">
+      <input type="checkbox" id="remember-pat" style="cursor:pointer;accent-color:#1a1a1a">
+      Nhớ PAT trên máy này
+    </label>
+
+    <div id="save-status" style="display:none"></div>
+
+    <div style="display:flex;gap:8px">
+      <button onclick="closeSaveModal()"
+        style="flex:1;padding:10px;border:1.5px solid #E3E2DE;border-radius:8px;background:#fff;cursor:pointer;font-size:13px;color:#555;font-weight:500">
+        Huỷ
+      </button>
+      <button id="save-confirm-btn" onclick="confirmSave()"
+        style="flex:1;padding:10px;background:#1a1a1a;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500">
+        Lưu lên GitHub
+      </button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
