@@ -31,7 +31,7 @@
       "maPrice": 100000,
       "maPct": 60,
       "maMo": 1,
-      "annual": 35000,
+      "annual": 40000,
       "months": [
         false,
         true,
@@ -106,7 +106,7 @@
       "maPrice": 100000,
       "maPct": 100,
       "maMo": 1,
-      "annual": 10000,
+      "annual": 15000,
       "months": [
         true,
         true,
