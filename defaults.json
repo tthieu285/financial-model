@@ -1,7 +1,7 @@
 {
   "version": "v2",
   "inputs": {
-    "i-sf": 3,
+    "i-sf": 2.5,
     "i-shcvr": 0,
     "i-shrev": 0,
     "i-ff": 2,
@@ -14,17 +14,17 @@
     "i-corev": 15,
     "i-cohcvr": 0,
     "i-cohrev": 0,
-    "i-outpct": 30,
+    "i-outpct": 20,
     "i-logpct": 10,
+    "i-cogs": 45,
     "i-cons-mult": -33,
     "i-best-mult": 33,
-    "i-qgrowth": 20,
+    "i-qgrowth": 100,
     "cf-inv": 200000,
     "cf-eq": 50000,
     "cf-eq-mo": 1,
     "cf-tech": 30000,
-    "cf-tech-mo": 1,
-    "i-cogs": 45
+    "cf-tech-mo": 1
   },
   "partners": [
     {
@@ -32,23 +32,23 @@
       "name": "Happy IDEM",
       "segment": "school",
       "isMA": false,
-      "maPrice": 100000,
+      "maPrice": 80000,
       "maPct": 60,
       "maMo": 1,
-      "annual": 35000,
+      "annual": 37000,
       "months": [
+        true,
+        false,
+        true,
+        true,
+        false,
+        false,
         false,
         true,
         true,
         true,
         true,
-        true,
-        false,
-        true,
-        true,
-        true,
-        false,
-        false
+        true
       ],
       "outpct": null
     },
@@ -63,16 +63,16 @@
       "annual": 8000,
       "months": [
         true,
+        false,
         true,
-        true,
-        true,
+        false,
+        false,
         true,
         true,
         false,
         true,
         true,
-        true,
-        true,
+        false,
         true
       ],
       "outpct": 0
@@ -88,14 +88,14 @@
       "annual": 10000,
       "months": [
         true,
+        false,
         true,
         true,
         true,
         true,
         true,
         false,
-        true,
-        true,
+        false,
         true,
         true,
         true
@@ -113,13 +113,13 @@
       "annual": 20000,
       "months": [
         true,
+        false,
         true,
         true,
         true,
         true,
         true,
         false,
-        true,
         true,
         true,
         true,
@@ -132,13 +132,13 @@
     {
       "id": "r0",
       "label": "Cử nhân khúc xạ",
-      "n": 4,
+      "n": 3,
       "sal": 600
     },
     {
       "id": "r1",
       "label": "Kỹ thuật viên thị lực",
-      "n": 3,
+      "n": 2,
       "sal": 500
     },
     {
